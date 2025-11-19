@@ -1,11 +1,11 @@
 package EntityClass;
-public abstract class User2 {
-    protected String userId;
-    protected String name;
-    protected String password = "password";
-    protected FilterSettings filters;
+public abstract class User {
+    private String userId;
+    private String name;
+    private String password = "password";
+    private FilterSettings filters;
 
-    public User2(String userId, String name) {
+    public User(String userId, String name) {
         this.userId = userId;
         this.name = name;
         this.filters = new FilterSettings();
