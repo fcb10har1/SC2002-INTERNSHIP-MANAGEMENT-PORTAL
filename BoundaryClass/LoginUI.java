@@ -51,27 +51,34 @@ public class LoginUI {
         System.out.print("Enter password: ");
         String password = scanner.nextLine().trim();
 
-        Optional<User> loggedIn = authService.login(userId, password);
+        // First check if user exists
+        Optional<User> userOpt = authService.getUserRepository().findById(userId);
         
-        if (loggedIn.isPresent()) {
-            User user = loggedIn.get();
-            
-            // Check if CompanyRep is approved
-            if (user instanceof CompanyRep) {
-                CompanyRep rep = (CompanyRep) user;
-                if (!authService.isApprovedCompanyRep(rep)) {
-                    System.out.println("Your account is pending approval by Career Center Staff.");
-                    System.out.println("Please wait for approval before logging in.");
-                    return Optional.empty();
-                }
-            }
-            
-            System.out.println("Login successful.");
-            return loggedIn;
-        } else {
-            System.out.println("Login failed. Invalid user ID or password.");
+        if (!userOpt.isPresent()) {
+            System.out.println("Login failed. User ID not found.");
             return Optional.empty();
         }
+        
+        User user = userOpt.get();
+        
+        // Check if CompanyRep and if approved
+        if (user instanceof CompanyRep) {
+            CompanyRep rep = (CompanyRep) user;
+            if (!authService.isApprovedCompanyRep(rep)) {
+                System.out.println("Login failed. Your Company Representative account is pending approval by Career Center Staff.");
+                System.out.println("Please wait for approval before logging in.");
+                return Optional.empty();
+            }
+        }
+        
+        // Now verify password
+        if (!user.login(userId, password)) {
+            System.out.println("Login failed. Incorrect password.");
+            return Optional.empty();
+        }
+        
+        System.out.println("Login successful.");
+        return Optional.of(user);
     }
 
     private void handleCompanyRepRegistration() {

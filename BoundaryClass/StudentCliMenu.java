@@ -37,6 +37,7 @@ public class StudentCliMenu {
             System.out.println("2. View my applications");
             System.out.println("3. Accept/reject offers");
             System.out.println("4. Request withdrawal");
+            System.out.println("5. Change password");
             System.out.println("0. Logout");
             System.out.print("Enter choice: ");
 
@@ -58,6 +59,12 @@ public class StudentCliMenu {
                     break;
                 case 4:
                     requestWithdrawal(student);
+                    break;
+                case 5:
+                    if (changePassword(student)) {
+                        System.out.println("Password changed successfully. Please log in again with your new password.");
+                        return; // Force logout
+                    }
                     break;
                 case 0:
                     System.out.println("Logging out...");
@@ -238,5 +245,36 @@ public class StudentCliMenu {
         } catch (Exception e) {
             System.out.println("Error submitting withdrawal request: " + e.getMessage());
         }
+    }
+
+    private boolean changePassword(Student student) {
+        System.out.println("\n=== Change Password ===");
+        System.out.print("Enter current password: ");
+        String currentPassword = scanner.nextLine().trim();
+        
+        // Verify current password
+        if (!student.login(student.getUserId(), currentPassword)) {
+            System.out.println("Error: Current password is incorrect.");
+            return false;
+        }
+        
+        System.out.print("Enter new password: ");
+        String newPassword = scanner.nextLine().trim();
+        
+        if (newPassword.isEmpty()) {
+            System.out.println("Error: Password cannot be empty.");
+            return false;
+        }
+        
+        System.out.print("Confirm new password: ");
+        String confirmPassword = scanner.nextLine().trim();
+        
+        if (!newPassword.equals(confirmPassword)) {
+            System.out.println("Error: Passwords do not match.");
+            return false;
+        }
+        
+        student.changePassword(newPassword);
+        return true;
     }
 }

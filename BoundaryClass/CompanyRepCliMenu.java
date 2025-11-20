@@ -37,6 +37,8 @@ public class CompanyRepCliMenu {
             System.out.println("3. Edit opportunity");
             System.out.println("4. Toggle opportunity visibility");
             System.out.println("5. Review applications for an opportunity");
+            System.out.println("6. Delete opportunity");
+            System.out.println("7. Change password");
             // Report generation removed (career staff only)
             System.out.println("0. Logout");
             System.out.print("Enter choice: ");
@@ -62,6 +64,15 @@ public class CompanyRepCliMenu {
                     break;
                 case 5:
                     reviewApplications(rep);
+                    break;
+                case 6:
+                    deleteOpportunity(rep);
+                    break;
+                case 7:
+                    if (changePassword(rep)) {
+                        System.out.println("Password changed successfully. Please log in again with your new password.");
+                        return; // Force logout
+                    }
                     break;
                 case 0:
                     System.out.println("Logging out...");
@@ -180,6 +191,7 @@ public class CompanyRepCliMenu {
             System.out.println("   Slots (remaining/total): " + opp.getSlots() + "/" + opp.getSlotCap());
             System.out.println("   Visible: " + (opp.getVisible() ? "Yes" : "No"));
             System.out.println("   Open: " + opp.getOpenDate() + " | Close: " + opp.getCloseDate());
+            System.out.println("   Description: " + opp.getDescription());
         }
     }
 
@@ -208,25 +220,101 @@ public class CompanyRepCliMenu {
         
         InternshipOpportunity opp = myOpps.get(choice - 1);
         
-        // Can only edit if status is Pending or Approved (not Filled/Rejected)
-        if (opp.getStatus() == OpportunityStatus.Filled) {
-            System.out.println("Cannot edit a filled opportunity.");
+        // Cannot edit filled or rejected opportunities
+        if (opp.getStatus() == OpportunityStatus.Filled || opp.getStatus() == OpportunityStatus.Rejected) {
+            System.out.println("Cannot edit a " + opp.getStatus().toString().toLowerCase() + " opportunity.");
             return;
         }
         
-        System.out.println("\n=== Edit Opportunity ===");
-        System.out.println("Leave blank to keep current value");
+        boolean isApproved = (opp.getStatus() == OpportunityStatus.Approved);
         
-        System.out.print("New Title [" + opp.getTitle() + "]: ");
-        String newTitle = scanner.nextLine().trim();
-        if (!newTitle.isEmpty()) {
-            opp.setBasics(newTitle, opp.getDescription(), opp.getPreferredMajor(), opp.getLevel(), opp.getSlotCap());
+        System.out.println("\n=== Edit Opportunity ===");
+        if (isApproved) {
+            System.out.println("Note: Opportunity is approved. Only description can be edited.");
+        } else {
+            System.out.println("Leave blank to keep current value");
         }
         
-        System.out.print("New Description [" + opp.getDescription() + "]: ");
-        String newDesc = scanner.nextLine().trim();
-        if (!newDesc.isEmpty()) {
-            opp.setBasics(opp.getTitle(), newDesc, opp.getPreferredMajor(), opp.getLevel(), opp.getSlotCap());
+        // If Pending, allow full edit
+        if (!isApproved) {
+            System.out.print("New Title [" + opp.getTitle() + "]: ");
+            String newTitle = scanner.nextLine().trim();
+            
+            System.out.print("New Description [" + opp.getDescription() + "]: ");
+            String newDesc = scanner.nextLine().trim();
+            
+            System.out.print("New Preferred Major [" + opp.getPreferredMajor() + "]: ");
+            String newMajor = scanner.nextLine().trim();
+            
+            System.out.print("New Level (Basic/Intermediate/Advanced) [" + opp.getLevel() + "]: ");
+            String newLevelStr = scanner.nextLine().trim();
+            InternshipLevel newLevel = opp.getLevel();
+            if (!newLevelStr.isEmpty()) {
+                try {
+                    newLevel = InternshipLevel.valueOf(newLevelStr);
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Invalid level. Keeping current value.");
+                }
+            }
+            
+            System.out.print("New Number of Slots [" + opp.getSlotCap() + "]: ");
+            String newSlotsStr = scanner.nextLine().trim();
+            int newSlots = opp.getSlotCap();
+            if (!newSlotsStr.isEmpty()) {
+                try {
+                    newSlots = Integer.parseInt(newSlotsStr);
+                    if (newSlots > 10) {
+                        System.out.println("Maximum 10 slots. Setting to 10.");
+                        newSlots = 10;
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid number. Keeping current value.");
+                }
+            }
+            
+            System.out.print("New Opening Date (YYYY-MM-DD) [" + opp.getOpenDate() + "]: ");
+            String newOpenStr = scanner.nextLine().trim();
+            java.time.LocalDate newOpen = opp.getOpenDate();
+            if (!newOpenStr.isEmpty()) {
+                try {
+                    newOpen = java.time.LocalDate.parse(newOpenStr);
+                } catch (java.time.format.DateTimeParseException e) {
+                    System.out.println("Invalid date. Keeping current value.");
+                }
+            }
+            
+            System.out.print("New Closing Date (YYYY-MM-DD) [" + opp.getCloseDate() + "]: ");
+            String newCloseStr = scanner.nextLine().trim();
+            java.time.LocalDate newClose = opp.getCloseDate();
+            if (!newCloseStr.isEmpty()) {
+                try {
+                    newClose = java.time.LocalDate.parse(newCloseStr);
+                } catch (java.time.format.DateTimeParseException e) {
+                    System.out.println("Invalid date. Keeping current value.");
+                }
+            }
+            
+            // Apply changes
+            if (!newTitle.isEmpty() || !newDesc.isEmpty() || !newMajor.isEmpty()) {
+                opp.setBasics(
+                    newTitle.isEmpty() ? opp.getTitle() : newTitle,
+                    newDesc.isEmpty() ? opp.getDescription() : newDesc,
+                    newMajor.isEmpty() ? opp.getPreferredMajor() : newMajor,
+                    newLevel,
+                    newSlots
+                );
+            } else {
+                opp.setBasics(opp.getTitle(), opp.getDescription(), opp.getPreferredMajor(), newLevel, newSlots);
+            }
+            opp.setWindows(newOpen, newClose);
+            
+        } else {
+            // If Approved, only allow description edit
+            System.out.print("New Description [" + opp.getDescription() + "]: ");
+            String newDesc = scanner.nextLine().trim();
+            if (!newDesc.isEmpty()) {
+                opp.setBasics(opp.getTitle(), newDesc, opp.getPreferredMajor(), opp.getLevel(), opp.getSlotCap());
+            }
         }
         
         opportunityManager.getRepository().save(opp);
@@ -365,6 +453,80 @@ public class CompanyRepCliMenu {
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
+    }
+
+    private void deleteOpportunity(CompanyRep rep) {
+        List<InternshipOpportunity> myOpps = opportunityManager.listOwnedOpps(rep);
+        
+        if (myOpps.isEmpty()) {
+            System.out.println("\nYou have no opportunities to delete.");
+            return;
+        }
+        
+        listMyOpportunities(rep);
+        
+        System.out.print("\nSelect opportunity number to delete (0 to cancel): ");
+        int choice;
+        try {
+            choice = Integer.parseInt(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input.");
+            return;
+        }
+        
+        if (choice == 0 || choice < 0 || choice > myOpps.size()) {
+            return;
+        }
+        
+        InternshipOpportunity opp = myOpps.get(choice - 1);
+        
+        // Can only delete Pending or Approved (not Filled or Rejected)
+        if (opp.getStatus() != OpportunityStatus.Pending && opp.getStatus() != OpportunityStatus.Approved) {
+            System.out.println("Cannot delete " + opp.getStatus().toString().toLowerCase() + " opportunities.");
+            System.out.println("Only pending or approved opportunities can be deleted.");
+            return;
+        }
+        
+        System.out.print("Are you sure you want to delete '" + opp.getTitle() + "'? (yes/no): ");
+        String confirm = scanner.nextLine().trim().toLowerCase();
+        
+        if (confirm.equals("yes") || confirm.equals("y")) {
+            opportunityManager.getRepository().delete(opp.getOpportunityID());
+            System.out.println("✓ Opportunity deleted successfully.");
+        } else {
+            System.out.println("Deletion cancelled.");
+        }
+    }
+
+    private boolean changePassword(CompanyRep rep) {
+        System.out.println("\n=== Change Password ===");
+        System.out.print("Enter current password: ");
+        String currentPassword = scanner.nextLine().trim();
+        
+        // Verify current password
+        if (!rep.login(rep.getUserId(), currentPassword)) {
+            System.out.println("Error: Current password is incorrect.");
+            return false;
+        }
+        
+        System.out.print("Enter new password: ");
+        String newPassword = scanner.nextLine().trim();
+        
+        if (newPassword.isEmpty()) {
+            System.out.println("Error: Password cannot be empty.");
+            return false;
+        }
+        
+        System.out.print("Confirm new password: ");
+        String confirmPassword = scanner.nextLine().trim();
+        
+        if (!newPassword.equals(confirmPassword)) {
+            System.out.println("Error: Passwords do not match.");
+            return false;
+        }
+        
+        rep.changePassword(newPassword);
+        return true;
     }
 
     // Report generation removed from CompanyRep interface (restricted to CareerStaff)
