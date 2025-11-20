@@ -122,4 +122,25 @@ public class InternshipOpportunity {
     public void addApplication(Application app) {
         applications.add(app);
     }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public int getSlots() {
+        return slotCap - (int) confirmedCount();
+}   
+    public InternshipOpportunity(CompanyRep owner, String companyName, int slotCap) {
+        this.opportunityID = java.util.UUID.randomUUID().toString();
+        this.title = "";
+        this.description = "";
+        this.preferredMajor = null;
+        this.level = null;
+        this.openDate = null;
+        this.closeDate = null;
+        this.companyName = companyName;
+        this.owner = owner;
+        this.slotCap = slotCap;
+}   
+
 }

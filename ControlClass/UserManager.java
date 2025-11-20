@@ -23,7 +23,7 @@ public class UserManager {
 
     public boolean changePassword(String userId, String newPwd) {
         Optional<User> opt = userRepository.findById(userId);
-        if (opt.isEmpty()) {
+        if (!opt.isPresent()) {
             System.out.println("User not found: " + userId);
             return false;
         }
@@ -45,13 +45,14 @@ public class UserManager {
             return false;
         }
 
-        if (!(userRepository instanceof UserRepository concrete)) {
+        if (!(userRepository instanceof UserRepository)) {
             System.out.println("Repository does not support approval tracking.");
             return false;
         }
 
+        UserRepository concrete = (UserRepository) userRepository;
         concrete.markCompanyRepApproved(rep);
-        userRepository.update(rep); // keep repo in sync
+        userRepository.update(rep);
         System.out.println("CompanyRep " + rep.getUserId()
                 + " approved by staff " + approver.getUserId());
         return true;

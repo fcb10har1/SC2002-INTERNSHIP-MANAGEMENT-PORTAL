@@ -1,6 +1,8 @@
 package RepositoryClass;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
 import EntityClass.InternshipOpportunity;
 
 public class OpportunityRepository implements IOpportunityRepository {
@@ -20,10 +22,9 @@ public class OpportunityRepository implements IOpportunityRepository {
     @Override
     public List<InternshipOpportunity> findVisibleFor(String major, int year) {
         return store.values().stream()
-                .filter(InternshipOpportunity::getVisible)         
-                .filter(io -> major == null 
-                        || major.equalsIgnoreCase(io.getPreferredMajor()))
-                .toList();
+                .filter(io -> io.getVisible())
+                .filter(io -> major == null || major.equalsIgnoreCase(io.getPreferredMajor()))
+                .collect(Collectors.toList());
     }
 
     @Override
