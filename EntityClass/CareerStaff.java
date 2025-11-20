@@ -1,5 +1,8 @@
 package EntityClass;
 
+/**
+ * Represents a career staff member in the internship management portal.
+ */
 public class CareerStaff extends User {
     private String department;
 
@@ -8,11 +11,17 @@ public class CareerStaff extends User {
         this.department = department;
     }
 
-    //Unsure if we need get department and set department methods
+    /**
+     * Returns the department of this career staff member.
+     */
     
     public String getDepartment() {
         return department;
     }
+
+    /**
+     * Sets the department of this career staff member.
+     */
 
     public void setDepartment(String department) {
         this.department = department;
