@@ -11,8 +11,9 @@ import RepositoryClass.IOpportunityRepository;
 
 import java.util.List;
 
-/*
- * Manages application processes between Students and CompanyReps
+/**
+ * Manages application lifecycle operations between Students and Company Representatives,
+ * including applying, rep approval/rejection, and student acceptance/rejection of offers.
  */
 public class ApplicationManager {
 
@@ -20,8 +21,10 @@ public class ApplicationManager {
     @SuppressWarnings("unused")
     private final IOpportunityRepository opportunityRepo;
 
-    /*
-     * Constructor
+    /**
+     * Constructs an ApplicationManager with the required repositories.
+     * @param applicationRepo repository for persisting applications
+     * @param opportunityRepo repository for accessing opportunities (may be used for side-effects)
      */
     public ApplicationManager(IApplicationRepository applicationRepo,
                               IOpportunityRepository opportunityRepo) {
@@ -29,8 +32,13 @@ public class ApplicationManager {
         this.opportunityRepo = opportunityRepo;
     }
 
-    /*
-     * Student applies for an internship opportunity
+    /**
+     * Creates a new application for the given student and opportunity enforcing
+     * a maximum of 3 concurrent applications.
+     * @param student the student applying
+     * @param opportunity the opportunity being applied to
+     * @return the created Application
+     * @throws IllegalStateException if the student already has 3 applications
      */
     public Application apply(Student student, InternshipOpportunity opportunity) {
         List<Application> existing = applicationRepo.findByStudent(student);
@@ -46,8 +54,11 @@ public class ApplicationManager {
         return app;
     }
 
-    /*
-     * CompanyRep approves an application
+    /**
+     * Approves a pending application by the owning company representative.
+     * @param rep the company representative performing approval
+     * @param application the target application
+     * @throws IllegalStateException if rep is not owner or application not Pending
      */
     public void repApprove(CompanyRep rep, Application application) {
         if (!application.getTarget().getOwner().equals(rep)) {
@@ -59,8 +70,11 @@ public class ApplicationManager {
         application.setStatus(ApplicationStatus.Successful);
         applicationRepo.update(application);
     }
-    /*
-     * CompanyRep rejects an application
+    /**
+     * Rejects a pending application by the owning company representative.
+     * @param rep the company representative performing rejection
+     * @param application the target application
+     * @throws IllegalStateException if rep is not owner or application not Pending
      */
     public void repReject(CompanyRep rep, Application application) {
         if (!application.getTarget().getOwner().equals(rep)) {
@@ -73,8 +87,11 @@ public class ApplicationManager {
         applicationRepo.update(application);
     }
 
-    /*
-     * Student accepts an offer
+    /**
+     * Accepts a successful application offer on behalf of the student, auto-rejecting all other
+     * outstanding successful/pending applications and updating opportunity fill status.
+     * @param application the successful application being accepted
+     * @throws IllegalStateException if application status is not Successful
      */
     public void studentAcceptOffer(Application application) {
         if (application.getStatus() != ApplicationStatus.Successful) {
@@ -103,8 +120,10 @@ public class ApplicationManager {
         }
     }
 
-    /*
-     * Student rejects an offer
+    /**
+     * Rejects a successful application offer on behalf of the student.
+     * @param application the successful application being rejected
+     * @throws IllegalStateException if application status is not Successful
      */
     public void studentRejectOffer(Application application) {
         if (application.getStatus() != ApplicationStatus.Successful) {
@@ -114,8 +133,9 @@ public class ApplicationManager {
         applicationRepo.update(application);
     }
 
-    /*
-     * Returns the application repository
+    /**
+     * Returns the backing application repository.
+     * @return application repository
      */
     public IApplicationRepository getApplicationRepository() {
         return applicationRepo;

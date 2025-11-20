@@ -15,8 +15,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-/*
- * Manages withdrawal requests including creation, approval, and rejection
+/**
+ * Manages withdrawal requests lifecycle: creation, approval, rejection and side-effects
+ * on applications and opportunities.
  */
 public class WithdrawalManager {
 
@@ -24,19 +25,32 @@ public class WithdrawalManager {
     private final IApplicationRepository applicationRepository;
     private final IOpportunityRepository opportunityRepository;
 
+    /**
+     * Constructs a WithdrawalManager with required repositories.
+     * @param opportunityRepository opportunity repository
+     * @param applicationRepository application repository
+     */
     public WithdrawalManager(IOpportunityRepository opportunityRepository, IApplicationRepository applicationRepository) {
         this.opportunityRepository = opportunityRepository;
         this.applicationRepository = applicationRepository;
     }
 
-    // Legacy no-arg constructor (kept if referenced elsewhere; repositories null -> limited functionality)
+    /**
+     * Constructs a WithdrawalManager with no repositories (legacy support - limited functionality).
+     */
     public WithdrawalManager() {
         this.opportunityRepository = null;
         this.applicationRepository = null;
     }
 
-    /* 
-     * Student requests withdrawal from an application
+    /**
+     * Creates a withdrawal request for the given application by the student.
+     * Prevents duplicates if a pending/approved request already exists.
+     * @param student the student requesting withdrawal
+     * @param application the target application
+     * @param reason explanatory reason
+     * @return created WithdrawalRequest
+     * @throws IllegalStateException if a request already exists
      */
     public WithdrawalRequest requestWithdrawal(Student student, Application application, String reason) {
         // Prevent duplicate or redundant withdrawal if one is pending or already approved
@@ -52,8 +66,10 @@ public class WithdrawalManager {
         return request;
     }
 
-    /* 
-     * Approves a withdrawal request by a CareerStaff member
+    /**
+     * Approves a pending withdrawal request performing application/opportunity side-effects.
+     * @param staff approving career staff member
+     * @param requestId withdrawal request identifier
      */
     public void approveWithdrawal(CareerStaff staff, String requestId) {
         WithdrawalRequest req = findByIdOrThrow(requestId);
@@ -79,8 +95,10 @@ public class WithdrawalManager {
         System.out.println("Withdrawal request " + requestId + " approved by " + staff.getUserId());
     }
 
-    /* 
-     * Rejects a withdrawal request by a CareerStaff member
+    /**
+     * Rejects a pending withdrawal request.
+     * @param staff rejecting career staff member
+     * @param requestId withdrawal request identifier
      */
     public void rejectWithdrawal(CareerStaff staff, String requestId) {
         WithdrawalRequest req = findByIdOrThrow(requestId);
@@ -92,15 +110,19 @@ public class WithdrawalManager {
         System.out.println("Withdrawal request " + requestId + " rejected by " + staff.getUserId());
     }
 
-    /*
-     * Returns all withdrawal requests
+    /**
+     * Returns a snapshot list of all withdrawal requests (processed and pending).
+     * @return list of requests
      */
     public List<WithdrawalRequest> getAllRequests() {
         return new ArrayList<>(requests);
     }
 
-    /*
-     * Finds a withdrawal request by its ID or throws an exception if not found
+    /**
+     * Finds a withdrawal request by ID or throws if absent.
+     * @param requestId request identifier
+     * @return matching WithdrawalRequest
+     * @throws IllegalArgumentException if not found
      */
     private WithdrawalRequest findByIdOrThrow(String requestId) {
         Optional<WithdrawalRequest> opt = requests.stream()

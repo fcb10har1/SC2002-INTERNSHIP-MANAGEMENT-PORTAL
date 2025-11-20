@@ -9,37 +9,45 @@ import EntityClass.CareerStaff;
 import RepositoryClass.IUserRepository;
 import RepositoryClass.UserRepository;
 
-/*
- * Manages authentication and authorization of users
+/**
+ * Provides authentication (login/logout) and basic role verification for users.
  */
 public class AuthService {
 
     private final IUserRepository userRepository;
 
-    /*
-     * Constructor
+    /**
+     * Constructs an AuthService with the given user repository.
+     * @param userRepository backing repository
      */
     public AuthService(IUserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    /*
-     * Logs in a user with given credentials
+    /**
+     * Attempts to authenticate a user by ID and password.
+     * @param userId user identifier
+     * @param password plaintext password attempt
+     * @return Optional containing authenticated User or empty if failed
      */
     public Optional<User> login(String userId, String password) {
         return userRepository.findById(userId)
                 .filter(u -> u.login(userId, password));
     }
 
-    /*
-     * Logs out the given user
+    /**
+     * Logs out the given user.
+     * @param user authenticated user
      */
     public void logout(User user) {
         user.logout();
     }
 
-    /*
-     * Verifies if the user has the specified role
+    /**
+     * Verifies if the user instance matches the textual role.
+     * @param user user instance
+     * @param role role string (Student|CompanyRep|CareerStaff)
+     * @return true if role matches, false otherwise
      */
     public boolean verifyRole(User user, String role) {
         switch (role) {
@@ -54,8 +62,10 @@ public class AuthService {
         }
     }
 
-    /*
-     * Checks if a CompanyRep is approved
+    /**
+     * Checks if a company representative has been approved.
+     * @param rep company representative
+     * @return true if approved, false otherwise
      */
     public boolean isApprovedCompanyRep(CompanyRep rep) {
         if (userRepository instanceof UserRepository) {
@@ -65,8 +75,9 @@ public class AuthService {
         return false;
     }
 
-    /*
-     * Returns the user repository
+    /**
+     * Returns the backing user repository.
+     * @return user repository
      */
     public IUserRepository getUserRepository() {
         return userRepository;

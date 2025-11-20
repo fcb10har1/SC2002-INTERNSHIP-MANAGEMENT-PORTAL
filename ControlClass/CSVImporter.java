@@ -8,12 +8,15 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-/*
- * Handles importing and exporting of data in CSV format
+/**
+ * Utility class for importing/exporting user-related data from/to CSV files.
  */
 public class CSVImporter {
-    /*
-     * Imports students from a CSV file into the user repository
+    /**
+     * Imports students from a CSV file (expects header) into the repository.
+     * @param filePath path to students.csv
+     * @param userRepo target user repository
+     * @return number of students imported
      */
     public static int importStudents(String filePath, IUserRepository userRepo) {
         int count = 0;
@@ -67,8 +70,11 @@ public class CSVImporter {
         return count;
     }
 
-    /*
-     * Imports career staff from a CSV file into the user repository
+    /**
+     * Imports career staff (expects header) from a CSV file into the repository.
+     * @param filePath path to careerstaff.csv
+     * @param userRepo target user repository
+     * @return number of staff imported
      */
     public static int importCareerStaff(String filePath, IUserRepository userRepo) {
         int count = 0;
@@ -120,8 +126,11 @@ public class CSVImporter {
         return count;
     }
 
-    /*
-     * Exports a CompanyRep to a CSV file in append mode
+    /**
+     * Appends a single company representative record to a CSV file.
+     * @param filePath target CSV path
+     * @param companyRep company representative entity
+     * @return true if written successfully, false otherwise
      */
     public static boolean exportCompanyRep(String filePath, EntityClass.CompanyRep companyRep) {
         try (java.io.FileWriter fw = new java.io.FileWriter(filePath, true);
@@ -146,8 +155,11 @@ public class CSVImporter {
         }
     }
 
-    /*
-     * Imports company representatives from a CSV file into the user repository
+    /**
+     * Imports company representatives (expects header) from a CSV file into the repository.
+     * @param filePath path to companyreps.csv
+     * @param userRepo target user repository
+     * @return number of company reps imported
      */
     public static int importCompanyReps(String filePath, IUserRepository userRepo) {
         int count = 0;

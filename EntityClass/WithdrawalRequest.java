@@ -1,7 +1,9 @@
 package EntityClass;
 
-// for students to submit a request to withdraw their application for an internship
 
+/**
+ * Represents a student's request to withdraw an existing application.
+ */
 public class WithdrawalRequest {
 
     private final String requestId;
@@ -13,7 +15,10 @@ public class WithdrawalRequest {
     private CareerStaff processedBy;
 
     /**
-     * Creates a new withdrawal request with the given details.
+     * Creates a new withdrawal request.
+     * @param requestId unique id
+     * @param application application to withdraw
+     * @param reason rationale for withdrawal
      */
     public WithdrawalRequest(String requestId, Application application, String reason) {
         this.requestId = requestId;
@@ -22,55 +27,62 @@ public class WithdrawalRequest {
     }
 
     /**
-     * Returns the request ID.
+     * Returns request id.
+     * @return request id
      */
     public String getRequestId() {
         return requestId;
     }
 
     /**
-     * Returns the application associated with the withdrawal request.
+     * Returns application being withdrawn.
+     * @return application instance
      */
     public Application getApplication() {
         return application;
     }
 
     /**
-     * Returns the reason for the withdrawal request.
+     * Returns withdrawal reason.
+     * @return reason text
      */
     public String getReason() {
         return reason;
     }
 
     /**
-     * Returns whether the withdrawal request is approved.
+     * Indicates approval status.
+     * @return true if approved
      */
     public boolean isApproved() {
         return approved;
     }
 
     /**
-     * Returns whether the withdrawal request has been processed.
+     * Indicates whether request processed.
+     * @return true if processed
      */
     public boolean isProcessed() {
         return processed;
     }
 
     /**
-     * Returns the staff member who processed the withdrawal request.
+     * Returns processing staff member if processed.
+     * @return staff or null
      */
     public CareerStaff getProcessedBy() {
         return processedBy;
     }
 
-    /**  
-     * * Submits the withdrawal request.
+    /**
+     * Submits the withdrawal request (placeholder - no logic yet).
      */
     public void submitRequest() {
     }
 
-    /**  
+    /**
      * Approves the withdrawal request.
+     * @param staff staff member approving
      */
     public void approve(CareerStaff staff) {
         this.approved = true;
@@ -78,8 +90,9 @@ public class WithdrawalRequest {
         this.processedBy = staff;
     }
 
-    /**  
+    /**
      * Rejects the withdrawal request.
+     * @param staff staff member rejecting
      */
     public void reject(CareerStaff staff) {
         this.approved = false;
@@ -87,8 +100,9 @@ public class WithdrawalRequest {
         this.processedBy = staff;
     }
 
-    /**   
-     * Returns a string representation of the withdrawal request.
+    /**
+     * Returns string summary of request.
+     * @return formatted string
      */
     @Override
     public String toString() {

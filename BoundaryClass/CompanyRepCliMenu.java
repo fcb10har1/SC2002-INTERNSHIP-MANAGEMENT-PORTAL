@@ -16,8 +16,9 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
-/*
- * CLI menu for Company Representative users to manage internship opportunities.
+/**
+ * CLI menu for Company Representative users to create, view, edit, delete and
+ * manage internship opportunities as well as review applications.
  */
 public class CompanyRepCliMenu {
 
@@ -26,6 +27,12 @@ public class CompanyRepCliMenu {
     private final OpportunityManager opportunityManager;
     private FilterSettings filterSettings = new FilterSettings(); // Persists across menu navigation
 
+    /**
+     * Constructs the company representative CLI menu with required managers and input scanner.
+     * @param scanner interactive input source
+     * @param appMgr application manager
+     * @param oppMgr opportunity manager
+     */
     public CompanyRepCliMenu(Scanner scanner,
                              ApplicationManager appMgr,
                              OpportunityManager oppMgr) {
@@ -34,8 +41,9 @@ public class CompanyRepCliMenu {
         this.opportunityManager = oppMgr;
     }
 
-    /*
+    /**
      * Displays the Company Representative menu and handles user input.
+     * @param rep the logged-in company representative
      */
     public void showOptions(CompanyRep rep) {
         int choice;
@@ -92,8 +100,10 @@ public class CompanyRepCliMenu {
         } while (choice != 0);
     }
 
-    /*
-     * Create a new internship opportunity.
+    /**
+     * Creates a new internship opportunity owned by the company representative.
+     * Enforces a maximum of 5 opportunities and defaulting invalid inputs.
+     * @param rep the logged-in company representative
      */
     private void createOpportunity(CompanyRep rep) {
         // Check if rep has reached max opportunities (5)
@@ -186,8 +196,9 @@ public class CompanyRepCliMenu {
         System.out.println("Status: Pending (awaiting Career Staff approval)");
     }
     
-    /*
-     * List all internship opportunities owned by the company representative.
+    /**
+     * Lists (optionally filtered) internship opportunities belonging to the company representative.
+     * @param rep the logged-in company representative
      */
     private void listMyOpportunities(CompanyRep rep) {
         // Manage filters
@@ -237,8 +248,8 @@ public class CompanyRepCliMenu {
         }
     }
     
-    /*
-     * Allows the company representative to configure filter settings for viewing opportunities.
+    /**
+     * Configures persistent filter settings used when listing owned opportunities.
      */
     private void configureFilters() {
         System.out.println("\n=== Configure Filters ===");
@@ -288,8 +299,9 @@ public class CompanyRepCliMenu {
         System.out.println("\n✓ Filters configured: " + filterSettings.getSummary());
     }
 
-    /*
-     * Edit an existing internship opportunity.
+    /**
+     * Edits fields of an existing internship opportunity, with restrictions if already approved.
+     * @param rep the logged-in company representative
      */
     private void editOpportunity(CompanyRep rep) {
         List<InternshipOpportunity> myOpps = opportunityManager.listOwnedOpps(rep);
@@ -417,8 +429,9 @@ public class CompanyRepCliMenu {
         System.out.println("✓ Opportunity updated successfully!");
     }
 
-    /*
-     * Toggle visibility of an internship opportunity.
+    /**
+     * Toggles visibility flag of an approved internship opportunity.
+     * @param rep the logged-in company representative
      */
     private void toggleVisibility(CompanyRep rep) {
         List<InternshipOpportunity> myOpps = opportunityManager.listOwnedOpps(rep);
@@ -456,8 +469,9 @@ public class CompanyRepCliMenu {
         System.out.println("✓ Visibility toggled! Now: " + (opp.getVisible() ? "ON" : "OFF"));
     }
 
-    /*
-     * Review applications for a selected internship opportunity.
+    /**
+     * Reviews applications tied to a selected opportunity, enabling approval/rejection of pending ones.
+     * @param rep the logged-in company representative
      */
     private void reviewApplications(CompanyRep rep) {
         // First, list the company rep's opportunities
@@ -561,8 +575,9 @@ public class CompanyRepCliMenu {
         }
     }
 
-    /*
-     * Delete an internship opportunity.
+    /**
+     * Deletes a pending or approved internship opportunity after confirmation.
+     * @param rep the logged-in company representative
      */
     private void deleteOpportunity(CompanyRep rep) {
         List<InternshipOpportunity> myOpps = opportunityManager.listOwnedOpps(rep);
@@ -607,8 +622,10 @@ public class CompanyRepCliMenu {
         }
     }
 
-    /*
-     * Change password for the Company Representative user.
+    /**
+     * Changes the password for the company representative after validating current password.
+     * @param rep the logged-in company representative
+     * @return true if password changed (logout required), false otherwise
      */
     private boolean changePassword(CompanyRep rep) {
         System.out.println("\n=== Change Password ===");

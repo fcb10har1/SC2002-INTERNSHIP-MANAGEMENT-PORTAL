@@ -29,8 +29,12 @@ public class StudentCliMenu {
     private final WithdrawalManager withdrawalManager;
     private FilterSettings filterSettings = new FilterSettings(); // Persists across menu navigation
 
-    /*     
-     * Constructor initializes the CLI menu with required managers and scanner.
+    /**
+     * Constructs the student CLI menu with required managers and input scanner.
+     * @param scanner interactive input source
+     * @param appMgr application manager
+     * @param oppMgr opportunity manager
+     * @param wdMgr withdrawal manager
      */
     public StudentCliMenu(Scanner scanner,
                           ApplicationManager appMgr,
@@ -42,8 +46,9 @@ public class StudentCliMenu {
         this.withdrawalManager = wdMgr;
     }
 
-    /*     
-     * Displays the student menu options and handles user input.
+    /**
+     * Displays the student menu loop handling user selections until logout.
+     * @param student the logged-in student
      */
     public void showOptions(Student student) {
         int choice;
@@ -91,8 +96,10 @@ public class StudentCliMenu {
         } while (choice != 0);
     }
 
-    /*     
-     * Displays available opportunities and allows the student to apply.
+    /**
+     * Displays eligible internship opportunities (after optional filter configuration)
+     * and allows the student to submit an application.
+     * @param student the logged-in student
      */
     private void viewAndApplyOpportunities(Student student) {
         // Manage filters
@@ -166,8 +173,8 @@ public class StudentCliMenu {
         }
     }
     
-    /*     
-     * Allows the student to configure filter settings for viewing opportunities.
+    /**
+     * Configures in-memory filter settings used to narrow opportunity listings.
      */
     private void configureFilters() {
         System.out.println("\n=== Configure Filters ===");
@@ -217,8 +224,9 @@ public class StudentCliMenu {
         System.out.println("\n✓ Filters configured: " + filterSettings.getSummary());
     }
 
-    /*     
-     * Displays the student's applications.
+    /**
+     * Displays all applications submitted by the student with current status and acceptance flag.
+     * @param student the logged-in student
      */
     private void viewMyApplications(Student student) {
         List<Application> apps = student.getApplications();
@@ -241,8 +249,10 @@ public class StudentCliMenu {
         }
     }
 
-    /*     
-     * Allows the student to accept or reject offers.
+    /**
+     * Shows successful (offer) applications that are not yet accepted and allows accepting or rejecting.
+     * Accepting will auto-mark other pending/successful applications as unsuccessful.
+     * @param student the logged-in student
      */
     private void acceptRejectOffers(Student student) {
         List<Application> successfulApps = student.getApplications().stream()
@@ -303,8 +313,9 @@ public class StudentCliMenu {
         }
     }
 
-    /*     
-     * Allows the student to request withdrawal from an application.
+    /**
+     * Initiates a withdrawal request for a chosen application providing a reason.
+     * @param student the logged-in student
      */
     private void requestWithdrawal(Student student) {
         List<Application> apps = student.getApplications();
@@ -354,8 +365,10 @@ public class StudentCliMenu {
         }
     }
 
-    /*     
-     * Allows the student to change their password.
+    /**
+     * Changes the student's password after validating the current password and confirmation.
+     * @param student the logged-in student
+     * @return true if password changed and user should logout, false otherwise
      */
     private boolean changePassword(Student student) {
         System.out.println("\n=== Change Password ===");

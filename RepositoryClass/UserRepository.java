@@ -6,9 +6,8 @@ import java.util.*;
 import EntityClass.User;
 import EntityClass.CompanyRep;
 
-/*
- * UserRepository provides in-memory storage and retrieval of User entities,
- * along with tracking approval and rejection status for CompanyReps.
+/**
+ * In-memory repository for User entities including tracking of CompanyRep approval/rejection state.
  */
 public class UserRepository implements IUserRepository {
 
@@ -19,54 +18,63 @@ public class UserRepository implements IUserRepository {
     // track which CompanyReps are rejected (persistent so they don't reappear)
     private final Set<String> rejectedCompanyRepIds = new HashSet<>();
 
-    /*     
-     * Adds a new User to the repository.
+    /**
+     * Adds a new user.
+     * @param u user instance
      */
     @Override
     public void add(User u) {
         users.put(u.getUserId(), u);
     }
 
-    /*     
-     * Finds a User by their ID.
+    /**
+     * Finds user by id.
+     * @param id user id
+     * @return optional user
      */
     @Override
     public Optional<User> findById(String id) {
         return Optional.ofNullable(users.get(id));
     }
 
-    /*     
-     * Updates an existing User in the repository.
+    /**
+     * Updates existing user state.
+     * @param u user instance
      */
     @Override
     public void update(User u) {
         users.put(u.getUserId(), u);
     }
 
-    /*     
-     * Retrieves all Users in the repository.
+    /**
+     * Returns all stored users.
+     * @return list of users
      */
     @Override
     public List<User> all() {
         return new ArrayList<>(users.values());
     }
 
-    /*     
-     * Marks a CompanyRep as approved.
+    /**
+     * Marks company representative as approved.
+     * @param rep company representative
      */
     public void markCompanyRepApproved(CompanyRep rep) {
         approvedCompanyRepIds.add(rep.getUserId());
     }
 
-    /*     
-     * Checks if a CompanyRep is approved.
+    /**
+     * Checks if representative is approved.
+     * @param rep company representative
+     * @return true if approved
      */
     public boolean isCompanyRepApproved(CompanyRep rep) {
         return approvedCompanyRepIds.contains(rep.getUserId());
     }
 
-    /*     
-     * Marks a CompanyRep as rejected.
+    /**
+     * Marks company representative as rejected.
+     * @param rep company representative
      */
     public void markCompanyRepRejected(CompanyRep rep) {
         // ensure exclusivity: if rejected, remove any prior approval
@@ -74,8 +82,10 @@ public class UserRepository implements IUserRepository {
         rejectedCompanyRepIds.add(rep.getUserId());
     }
 
-    /*     
-     * Checks if a CompanyRep is rejected.
+    /**
+     * Checks if representative is rejected.
+     * @param rep company representative
+     * @return true if rejected
      */
     public boolean isCompanyRepRejected(CompanyRep rep) {
         return rejectedCompanyRepIds.contains(rep.getUserId());

@@ -27,7 +27,17 @@ public class InternshipOpportunity {
     private List<Application> applications = new ArrayList<>();
 
     /**
-     * Creates a new internship opportunity with the given details.
+     * Creates a new internship opportunity with full details.
+     * @param opportunityID unique id
+     * @param title title
+     * @param description description
+     * @param preferredMajor preferred major or null
+     * @param level internship level
+     * @param openDate opening date
+     * @param closeDate closing date
+     * @param companyName company name
+     * @param owner owner representative
+     * @param slotCap slot capacity
      */
     public InternshipOpportunity(String opportunityID, String title, String description, String preferredMajor,
             InternshipLevel level, LocalDate openDate, LocalDate closeDate, String companyName, CompanyRep owner, int slotCap) {
@@ -45,111 +55,129 @@ public class InternshipOpportunity {
 
     /**
      * Returns the opportunity ID.
+     * @return id string
      */
     public String getOpportunityID() {
         return opportunityID;
     }
 
     /**
-     * Returns the title of the internship opportunity.
+     * Returns title.
+     * @return title
      */
     public String getTitle() {
         return title;
     }
 
     /**
-     * Returns the description of the internship opportunity.
+     * Returns description.
+     * @return description
      */
     public String getDescription() {
         return description;
     }
 
     /**
-     * Returns the preferred major for the internship opportunity.
+     * Returns preferred major.
+     * @return preferred major or null
      */
     public String getPreferredMajor() {
         return preferredMajor;
     }
 
     /**
-     * Returns the internship level for the internship opportunity.
+     * Returns internship level.
+     * @return level enum or null
      */
     public InternshipLevel getLevel() {
         return level;
     }
 
     /**
-     * Returns the open date for the internship opportunity.
+     * Returns opening date.
+     * @return opening date or null
      */
     public LocalDate getOpenDate() {
         return openDate;
     }
 
     /**
-     * Returns the close date for the internship opportunity.
+     * Returns closing date.
+     * @return closing date or null
      */
     public LocalDate getCloseDate() {
         return closeDate;
     }
 
     /**
-     * Returns the status of the internship opportunity.
+     * Returns status.
+     * @return opportunity status
      */
     public OpportunityStatus getStatus() {
         return status;
     }       
     /**
-     * Returns whether the internship opportunity is visible.
+     * Returns whether opportunity is visible.
+     * @return true if visible
      */
     public boolean getVisible() {
         return visible;
     }
     /**
-     * Returns the company name offering the internship opportunity.
+     * Returns company name.
+     * @return company name
      */
     public String getCompanyName() {
         return companyName;
     }
     /**
-     * Returns the owner (company representative) of the internship opportunity.
+     * Returns owner representative.
+     * @return owner
      */
     public CompanyRep getOwner() {
         return owner;
     }
     /**
-     * Returns the slot capacity of the internship opportunity.
+     * Returns slot capacity.
+     * @return slot cap integer
      */
     public int getSlotCap() {
         return slotCap;
     }
     /**
-     * Returns the list of applications for the internship opportunity.
+     * Returns applications linked to this opportunity.
+     * @return list of applications
      */
     public List<Application> getApplications() {
         return applications;
     }
     /**
-     * Sets the status of the internship opportunity.
+     * Sets status.
+     * @param status new status value
      */
     public void setStatus(OpportunityStatus status) {
         this.status = status;
     }       
     /**
-     * Sets the visibility of the internship opportunity.
+     * Sets visibility.
+     * @param visible new visibility flag
      */
     public void setVisible(boolean visible) {
         this.visible = visible;
     }
 
     /**
-     * Checks whether the slots for the internship opportunity are filled.
+     * Determines if all slots are filled.
+     * @return true if confirmed applications reach cap
      */
     public boolean slotsFilled() {
         return confirmedCount() >= slotCap;
     }
     
     /**
-     * Sets the open and close dates for the internship opportunity.
+     * Sets window dates.
+     * @param openDate opening date
+     * @param closeDate closing date
      */
     public void setWindows(LocalDate openDate, LocalDate closeDate) {
         this.openDate = openDate;
@@ -157,7 +185,12 @@ public class InternshipOpportunity {
     }
 
     /**
-     * Sets the basic details of the internship opportunity.
+     * Sets basic properties.
+     * @param title title
+     * @param description description
+     * @param preferredMajor preferred major
+     * @param level level
+     * @param slotCap slot capacity
      */
     public void setBasics(String title, String description, String preferredMajor, InternshipLevel level, int slotCap) {
         this.title = title;
@@ -168,7 +201,8 @@ public class InternshipOpportunity {
     }
 
     /**
-     * Returns the count of confirmed applications for the internship opportunity.
+     * Counts confirmed applications.
+     * @return count of confirmed apps
      */
     public long confirmedCount() {
         return applications.stream()
@@ -177,27 +211,33 @@ public class InternshipOpportunity {
     }
 
     /**
-     * Adds an application to the internship opportunity.
+     * Adds an application.
+     * @param app application instance
      */
     public void addApplication(Application app) {
         applications.add(app);
     }
     
     /**
-     * Returns whether the internship opportunity is visible.
+     * Returns visibility state.
+     * @return true if visible
      */
     public boolean isVisible() {
         return visible;
     }
 
     /**
-     * Returns the number of available slots for the internship opportunity.
+     * Returns remaining available slots.
+     * @return available slot count
      */
     public int getSlots() {
         return slotCap - (int) confirmedCount();
 }   
     /**
-     * Creates a new internship opportunity with minimal details.
+     * Creates a new internship opportunity with minimal draft details.
+     * @param owner owner representative
+     * @param companyName company name
+     * @param slotCap slot capacity
      */
     public InternshipOpportunity(CompanyRep owner, String companyName, int slotCap) {
         this.opportunityID = java.util.UUID.randomUUID().toString();

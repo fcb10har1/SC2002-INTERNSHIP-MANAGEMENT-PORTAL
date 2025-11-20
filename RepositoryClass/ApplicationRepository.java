@@ -7,31 +7,36 @@ import EntityClass.Student;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/*
- * ApplicationRepository provides in-memory storage and retrieval of Application entities.
+/**
+ * In-memory repository for Application entities with query helpers by student/opportunity.
  */
 public class ApplicationRepository implements IApplicationRepository {
 
     private final Map<String, Application> store = new HashMap<>();
 
-    /*     
-     * Adds a new Application to the repository.
+    /**
+     * Adds a new application to the repository.
+     * @param a application instance
      */
     @Override
     public void add(Application a) {
         store.put(generateId(a), a);
     }
 
-    /*     
-     * Finds an Application by its ID.
+    /**
+     * Finds an application by its generated ID.
+     * @param id generated application id
+     * @return optional application
      */
     @Override
     public Optional<Application> findById(String id) {
         return Optional.ofNullable(store.get(id));
     }
 
-    /*     
-     * Finds all Applications submitted by a specific Student.
+    /**
+     * Finds all applications submitted by a specific student.
+     * @param s student
+     * @return list of applications for the student
      */
     @Override
     public List<Application> findByStudent(Student s) {
@@ -40,8 +45,10 @@ public class ApplicationRepository implements IApplicationRepository {
                 .collect(Collectors.toList());
     }
 
-    /*     
-     * Finds all Applications targeting a specific InternshipOpportunity.
+    /**
+     * Finds all applications targeting a specific internship opportunity.
+     * @param io target opportunity
+     * @return list of applications for the opportunity
      */
     @Override
     public List<Application> findByOpportunity(InternshipOpportunity io) {
@@ -50,8 +57,9 @@ public class ApplicationRepository implements IApplicationRepository {
                 .collect(Collectors.toList());
     }
 
-    /*     
-     * Updates an existing Application in the repository.
+    /**
+     * Updates (replaces) an existing application.
+     * @param a application instance (by identity)
      */
     @Override
     public void update(Application a) {
@@ -59,16 +67,19 @@ public class ApplicationRepository implements IApplicationRepository {
         store.replace(generateId(a), a);
     }
 
-    /*     
-     * Retrieves all Applications in the repository.
+    /**
+     * Returns all applications currently stored.
+     * @return list of applications
      */
     @Override
     public List<Application> all() {
         return new ArrayList<>(store.values());
     }
 
-    /*     
-     * Generates a unique ID for an Application.
+    /**
+     * Generates a pseudo-unique id for an application using identity hash.
+     * @param a application
+     * @return generated id string
      */
     private String generateId(Application a) {
         // for now, just use identityHashCode – you can improve later

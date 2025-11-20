@@ -11,7 +11,12 @@ public class Student extends User {
     private List<Application> applications;
 
     /**
-     * Creates a new student with the given details.
+     * Creates a new student.
+     * @param userId unique id
+     * @param name student name
+     * @param email email address
+     * @param yearOfStudy academic year
+     * @param major major field of study
      */
     public Student(String userId, String name, String email, int yearOfStudy, String major) {
         super(userId, name, email);
@@ -22,6 +27,7 @@ public class Student extends User {
     
     /**
      * Returns the year of study of the student.
+     * @return year of study
      */
     public int getYearOfStudy() {
         return yearOfStudy;
@@ -29,20 +35,23 @@ public class Student extends User {
 
     /**
      * Returns the major of the student.
+     * @return major string
      */
     public String getMajor() {
         return major;
     }
 
     /**
-     * Returns the list of applications submitted by the student.
+     * Returns applications submitted by the student.
+     * @return list of applications
      */
     public List<Application> getApplications() {
         return applications;
     }
 
     /**
-     * Submits a new application for the student.
+     * Submits new application (max 3 enforced).
+     * @param app application instance
      */
     public void submitApplication(Application app) {
         if (applications.size() < 3) {
@@ -54,6 +63,7 @@ public class Student extends User {
 
     /**
      * Returns a string representation of the student.
+     * @return formatted string
      */
     @Override
     public String toString() {

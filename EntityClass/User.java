@@ -11,8 +11,11 @@ public abstract class User {
     private FilterSettings filters;
 
     /**
-    * Creates a new user with the given details.
-    */
+     * Creates a new user with the given details.
+     * @param userId unique id
+     * @param name display name
+     * @param email contact email
+     */
     public User(String userId, String name, String email) {
         this.userId = userId;
         this.name = name;
@@ -21,7 +24,10 @@ public abstract class User {
     }
     
     /**
-     * Logs in the user with the given credentials.
+     * Attempts login with provided credentials.
+     * @param userId user id
+     * @param pwd password
+     * @return true if credentials match stored values
      */
 
     public boolean login(String userId, String pwd) {
@@ -29,7 +35,7 @@ public abstract class User {
     }
 
     /**
-     * Logs out the user.
+     * Logs out the user (console side-effect only).
      */
     public void logout() {
         System.out.println(name + " logged out.");
@@ -37,6 +43,7 @@ public abstract class User {
 
     /**
      * Changes the user's password.
+     * @param newPwd new password
      */
     public void changePassword(String newPwd) {
         this.password = newPwd;
@@ -44,6 +51,7 @@ public abstract class User {
 
     /**
      * Returns the user ID.
+     * @return user id
      */
     public String getUserId() {
         return userId;
@@ -51,6 +59,7 @@ public abstract class User {
 
     /**
      * Returns the email of the user.
+     * @return email address
      */
     public String getEmail() {
         return email;
@@ -58,6 +67,7 @@ public abstract class User {
 
     /**
      * Sets the email of the user.
+     * @param email new email
      */
     public void setEmail(String email) {
         this.email = email;
@@ -65,27 +75,31 @@ public abstract class User {
 
     /**
      * Returns the name of the user.
+     * @return user name
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Sets the name of the user.
+     * Returns active filter settings for this user.
+     * @return filter settings object
      */
     public FilterSettings getFilters() {
         return filters;
     }
 
     /**
-     * Sets the filter settings for the user.
+     * Replaces filter settings for the user.
+     * @param f new filter settings
      */
     public void setFilters(FilterSettings f) {
         this.filters = f;
     }
 
-    /**  
-     *Returns a string representation of the user.
+    /**
+     * Returns a string representation of the user.
+     * @return formatted string
      */
     @Override
     public String toString() {

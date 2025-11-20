@@ -27,6 +27,10 @@ import java.util.Scanner;
  */
 public class MainApp {
 
+    /**
+     * Entry point for the application.
+     * @param args command line arguments (unused)
+     */
     public static void main(String[] args) {
         new MainApp().startCLI();
     }
@@ -51,8 +55,8 @@ public class MainApp {
     private final WithdrawalManager withdrawalManager;
     private final ReportManager reportManager;
 
-    /*     
-     * Constructor initializes repositories, managers, UIs, and imports users from CSV files.
+    /**
+     * Constructs MainApp initializing all repositories, managers, UIs, and imports users from CSV files.
      */
     public MainApp() {
         // managers
@@ -99,7 +103,7 @@ public class MainApp {
         System.out.println();
     }
 
-    /*     
+    /**
      * Seeds demo users into the user repository for testing purposes.
      */
     private void seedDemoUsers() {
@@ -130,7 +134,7 @@ public class MainApp {
         System.out.println();
     }
 
-    /*     
+    /**
      * Starts the main CLI interaction loop.
      */
     public void startCLI() {

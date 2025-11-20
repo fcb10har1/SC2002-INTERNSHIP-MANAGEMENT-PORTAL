@@ -18,6 +18,12 @@ public class LoginUI {
     private final UserManager userManager;
     private final Scanner scanner;
 
+    /**
+     * Constructs the login UI with required services and input scanner.
+     * @param authService authentication service
+     * @param userManager user manager
+     * @param scanner interactive input source
+     */
     public LoginUI(AuthService authService, UserManager userManager, Scanner scanner) {
         this.authService = authService;
         this.userManager = userManager;
@@ -51,8 +57,9 @@ public class LoginUI {
         }
     }
 
-    /*     
+    /**
      * Handles user login process.
+     * @return optional containing authenticated user or empty if login failed
      */
     private Optional<User> handleLogin() {
         System.out.print("Enter user ID: ");
@@ -91,7 +98,7 @@ public class LoginUI {
         return Optional.of(user);
     }
 
-    /*
+    /**
      * Handles registration process for Company Representatives.
      */
     private void handleCompanyRepRegistration() {
