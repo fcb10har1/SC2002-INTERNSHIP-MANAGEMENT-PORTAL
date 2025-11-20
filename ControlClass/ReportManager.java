@@ -9,6 +9,8 @@ import EntityClass.Application;
 import EntityClass.Enums.InternshipLevel;
 import EntityClass.InternshipOpportunity;
 import EntityClass.Enums.OpportunityStatus;
+import RepositoryClass.IApplicationRepository;
+import RepositoryClass.IOpportunityRepository;
 
 // generating reports for career staff
 public class ReportManager {
