@@ -21,7 +21,10 @@ import RepositoryClass.UserRepository;
 import java.util.Optional;
 import java.util.Scanner;
 
-// main app using CLI
+/**
+ * MainApp is the entry point for the Internship Placement Management System CLI application.
+ * It initializes repositories, managers, and user interfaces, and starts the main interaction loop.
+ */
 public class MainApp {
 
     public static void main(String[] args) {
@@ -49,6 +52,9 @@ public class MainApp {
     private final WithdrawalManager withdrawalManager;
     private final ReportManager reportManager;
 
+    /*     
+     * Constructor initializes repositories, managers, UIs, and imports users from CSV files.
+     */
     public MainApp() {
         // managers
         userManager = new UserManager(userRepository);
@@ -73,6 +79,9 @@ public class MainApp {
         seedDemoUsers();
     }
 
+    /*     
+     * Imports users from predefined CSV files using CSVImporter.
+     */
     private void importUsersFromCSV() {
         System.out.println("=== Importing Users from CSV Files ===");
         
@@ -91,6 +100,9 @@ public class MainApp {
         System.out.println();
     }
 
+    /*     
+     * Seeds demo users into the user repository for testing purposes.
+     */
     private void seedDemoUsers() {
         // Create demo users with email - all with default password "password"
         // Only add if they don't already exist (to avoid duplicates from CSV)
@@ -119,6 +131,9 @@ public class MainApp {
         System.out.println();
     }
 
+    /*     
+     * Starts the main CLI interaction loop.
+     */
     public void startCLI() {
         System.out.println("Welcome to the Internship Placement Management System!");
 

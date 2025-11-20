@@ -12,6 +12,10 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+/**
+ * StudentCliMenu provides a command-line interface for student users
+ * to interact with the internship placement management system.
+ */
 public class StudentCliMenu {
 
     private final Scanner scanner;
@@ -19,6 +23,9 @@ public class StudentCliMenu {
     private final OpportunityManager opportunityManager;
     private final WithdrawalManager withdrawalManager;
 
+    /*     
+     * Constructor initializes the CLI menu with required managers and scanner.
+     */
     public StudentCliMenu(Scanner scanner,
                           ApplicationManager appMgr,
                           OpportunityManager oppMgr,
@@ -29,6 +36,9 @@ public class StudentCliMenu {
         this.withdrawalManager = wdMgr;
     }
 
+    /*     
+     * Displays the student menu options and handles user input.
+     */
     public void showOptions(Student student) {
         int choice;
         do {
@@ -75,6 +85,9 @@ public class StudentCliMenu {
         } while (choice != 0);
     }
 
+    /*     
+     * Displays available opportunities and allows the student to apply.
+     */
     private void viewAndApplyOpportunities(Student student) {
         List<InternshipOpportunity> eligibleOpps = opportunityManager.listVisibleFor(student);
         
@@ -118,7 +131,10 @@ public class StudentCliMenu {
             System.out.println("Error: " + e.getMessage());
         }
     }
-
+    
+    /*     
+     * Displays the student's applications.
+     */
     private void viewMyApplications(Student student) {
         List<Application> apps = student.getApplications();
         
@@ -140,6 +156,9 @@ public class StudentCliMenu {
         }
     }
 
+    /*     
+     * Allows the student to accept or reject offers.
+     */
     private void acceptRejectOffers(Student student) {
         List<Application> successfulApps = student.getApplications().stream()
             .filter(app -> app.getStatus() == ApplicationStatus.Successful)
@@ -199,6 +218,9 @@ public class StudentCliMenu {
         }
     }
 
+    /*     
+     * Allows the student to request withdrawal from an application.
+     */
     private void requestWithdrawal(Student student) {
         List<Application> apps = student.getApplications();
         
@@ -247,6 +269,9 @@ public class StudentCliMenu {
         }
     }
 
+    /*     
+     * Allows the student to change their password.
+     */
     private boolean changePassword(Student student) {
         System.out.println("\n=== Change Password ===");
         System.out.print("Enter current password: ");
