@@ -65,4 +65,9 @@ public class ApplicationManager {
         application.setStatus(ApplicationStatus.Unsuccessful);
         applicationRepo.update(application);
     }
+
+    public IApplicationRepository getApplicationRepository() {
+        return applicationRepo;
+    }
 }
+

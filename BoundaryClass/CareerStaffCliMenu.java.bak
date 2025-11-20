@@ -55,14 +55,16 @@ public class CareerStaffCliMenu {
                     approveRejectCompanyReps(staff);
                     break;
                 case 2:
-                    approveRejectOpportunities(staff);
+                    // TODO: call opportunityManager.approve() OR reject()
+                    System.out.println("Opportunity approval - Not yet implemented");
                     break;
                 case 3:
                     // TODO: use withdrawalManager.approveWithdrawal() OR rejectWithdrawal()
                     System.out.println("Withdrawal approval - Not yet implemented");
                     break;
                 case 4:
-                    generateReports();
+                    // TODO: reuse ReportManager 
+                    System.out.println("Reports - Not yet implemented");
                     break;
                 case 0:
                     System.out.println("Logging out...");
@@ -134,96 +136,10 @@ public class CareerStaffCliMenu {
             System.out.println("Representative not approved.");
         }
     }
+}
 
-    private void approveRejectOpportunities(CareerStaff staff) {
-        List<EntityClass.InternshipOpportunity> pendingOpps = 
-            opportunityManager.getRepository().findByStatus(EntityClass.Enums.OpportunityStatus.Pending);
-        
-        if (pendingOpps.isEmpty()) {
-            System.out.println("\nNo pending opportunities to review.");
-            return;
-        }
-        
-        System.out.println("\n=== Pending Internship Opportunities ===");
-        for (int i = 0; i < pendingOpps.size(); i++) {
-            EntityClass.InternshipOpportunity opp = pendingOpps.get(i);
-            System.out.printf("\n%d. %s (ID: %s)%n", i + 1, opp.getTitle(), opp.getOpportunityID());
-            System.out.println("   Company: " + opp.getCompanyName());
-            System.out.println("   Level: " + opp.getLevel());
-            System.out.println("   Slots: " + opp.getSlotCap());
-            System.out.println("   Preferred Major: " + opp.getPreferredMajor());
-            System.out.println("   Open: " + opp.getOpenDate() + " | Close: " + opp.getCloseDate());
-        }
-        
-        System.out.print("\nSelect opportunity number (0 to cancel): ");
-        int choice;
-        try {
-            choice = Integer.parseInt(scanner.nextLine());
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid input.");
-            return;
-        }
-        
-        if (choice == 0 || choice < 0 || choice > pendingOpps.size()) {
-            return;
-        }
-        
-        EntityClass.InternshipOpportunity selectedOpp = pendingOpps.get(choice - 1);
-        
-        System.out.println("\n1. Approve");
-        System.out.println("2. Reject");
-        System.out.print("Choice: ");
-        
-        String action = scanner.nextLine().trim();
-        
-        try {
-            if ("1".equals(action)) {
-                opportunityManager.approve(staff, selectedOpp);
-                System.out.println("✓ Opportunity approved! Now visible to eligible students.");
-            } else if ("2".equals(action)) {
-                opportunityManager.reject(staff, selectedOpp);
-                System.out.println("✓ Opportunity rejected.");
-            } else {
-                System.out.println("Invalid choice.");
+                    System.out.println("Invalid choice.");
             }
-        } catch (IllegalStateException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-    }
-
-    private void generateReports() {
-        System.out.println("\n=== Generate Report ===");
-        System.out.println("1. All opportunities");
-        System.out.println("2. Filter by status");
-        System.out.println("3. Filter by major");
-        System.out.println("4. Filter by level");
-        System.out.print("Choice: ");
-        
-        String choice = scanner.nextLine().trim();
-        java.util.Map<String, String> filters = new java.util.HashMap<>();
-        
-        switch (choice) {
-            case "1":
-                // No filters
-                break;
-            case "2":
-                System.out.print("Enter status (Pending/Approved/Rejected/Filled): ");
-                filters.put("status", scanner.nextLine().trim());
-                break;
-            case "3":
-                System.out.print("Enter major: ");
-                filters.put("major", scanner.nextLine().trim());
-                break;
-            case "4":
-                System.out.print("Enter level (Basic/Intermediate/Advanced): ");
-                filters.put("level", scanner.nextLine().trim());
-                break;
-            default:
-                System.out.println("Invalid choice.");
-                return;
-        }
-        
-        String report = reportManager.generateReport(filters);
-        System.out.println(report);
+        } while (choice != 0);
     }
 }
