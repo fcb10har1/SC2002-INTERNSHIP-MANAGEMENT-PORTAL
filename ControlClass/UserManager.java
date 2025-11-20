@@ -58,6 +58,21 @@ public class UserManager {
         return true;
     }
 
+    public boolean rejectCompanyRep(CareerStaff approver, CompanyRep rep) {
+        if (approver == null || rep == null) {
+            return false;
+        }
+        if (!(userRepository instanceof UserRepository)) {
+            System.out.println("Repository does not support rejection tracking.");
+            return false;
+        }
+        UserRepository concrete = (UserRepository) userRepository;
+        concrete.markCompanyRepRejected(rep);
+        userRepository.update(rep);
+        System.out.println("CompanyRep " + rep.getUserId() + " rejected by staff " + approver.getUserId());
+        return true;
+    }
+
     public IUserRepository getUserRepository() {
         return userRepository;
     }

@@ -1,0 +1,4 @@
+CompanyRepID,Name,Email,CompanyName,Department,Position
+john.doe@company.com,John Doe,john.doe@company.com,Company,Cybersecurity,Manager
+john.wick@company2.com,John Wick,john.wick@company2.com,Company2,CEO,CEO
+hareesh@mapletree.com,Hareesh,hareesh@mapletree.com,Mapletree,AI,CEO

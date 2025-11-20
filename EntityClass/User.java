@@ -2,12 +2,14 @@ package EntityClass;
 public abstract class User {
     private String userId;
     private String name;
+    private String email;
     private String password = "password";
     private FilterSettings filters;
 
-    public User(String userId, String name) {
+    public User(String userId, String name, String email) {
         this.userId = userId;
         this.name = name;
+        this.email = email;
         this.filters = new FilterSettings();
     }
 
@@ -27,6 +29,18 @@ public abstract class User {
         return userId;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getName() {
+        return name;
+    }
+
     public FilterSettings getFilters() {
         return filters;
     }
@@ -37,7 +51,7 @@ public abstract class User {
 
     @Override
     public String toString() {
-        return "User ID: " + userId + ", Name: " + name;
+        return "User ID: " + userId + ", Name: " + name + ", Email: " + email;
     }
 }
 

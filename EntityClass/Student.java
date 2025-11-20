@@ -7,8 +7,8 @@ public class Student extends User {
     private String major;
     private List<Application> applications;
 
-    public Student(String userId, String name, int yearOfStudy, String major) {
-        super(userId, name);
+    public Student(String userId, String name, String email, int yearOfStudy, String major) {
+        super(userId, name, email);
         this.yearOfStudy = yearOfStudy;
         this.major = major;
         this.applications = new ArrayList<>();

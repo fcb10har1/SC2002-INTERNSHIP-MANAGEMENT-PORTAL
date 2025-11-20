@@ -3,8 +3,8 @@ package EntityClass;
 public class CareerStaff extends User {
     private String department;
 
-    public CareerStaff(String userID, String name, String department) {
-        super(userID, name);
+    public CareerStaff(String userID, String name, String email, String department) {
+        super(userID, name, email);
         this.department = department;
     }
 

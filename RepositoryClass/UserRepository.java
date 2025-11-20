@@ -12,6 +12,8 @@ public class UserRepository implements IUserRepository {
 
     // track which CompanyReps are approved by CareerStaff
     private final Set<String> approvedCompanyRepIds = new HashSet<>();
+    // track which CompanyReps are rejected (persistent so they don't reappear)
+    private final Set<String> rejectedCompanyRepIds = new HashSet<>();
 
     @Override
     public void add(User u) {
@@ -39,5 +41,15 @@ public class UserRepository implements IUserRepository {
 
     public boolean isCompanyRepApproved(CompanyRep rep) {
         return approvedCompanyRepIds.contains(rep.getUserId());
+    }
+
+    public void markCompanyRepRejected(CompanyRep rep) {
+        // ensure exclusivity: if rejected, remove any prior approval
+        approvedCompanyRepIds.remove(rep.getUserId());
+        rejectedCompanyRepIds.add(rep.getUserId());
+    }
+
+    public boolean isCompanyRepRejected(CompanyRep rep) {
+        return rejectedCompanyRepIds.contains(rep.getUserId());
     }
 }

@@ -2,19 +2,15 @@ package BoundaryClass;
 
 import ControlClass.ApplicationManager;
 import ControlClass.OpportunityManager;
-import ControlClass.ReportManager;
 import EntityClass.CompanyRep;
 import EntityClass.InternshipOpportunity;
 import EntityClass.Application;
 import EntityClass.Enums.InternshipLevel;
 import EntityClass.Enums.OpportunityStatus;
-import RepositoryClass.IOpportunityRepository;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -23,16 +19,13 @@ public class CompanyRepCliMenu {
     private final Scanner scanner;
     private final ApplicationManager applicationManager;
     private final OpportunityManager opportunityManager;
-    private final ReportManager reportManager;
 
     public CompanyRepCliMenu(Scanner scanner,
                              ApplicationManager appMgr,
-                             OpportunityManager oppMgr,
-                             ReportManager reportMgr) {
+                             OpportunityManager oppMgr) {
         this.scanner = scanner;
         this.applicationManager = appMgr;
         this.opportunityManager = oppMgr;
-        this.reportManager = reportMgr;
     }
 
     public void showOptions(CompanyRep rep) {
@@ -44,7 +37,7 @@ public class CompanyRepCliMenu {
             System.out.println("3. Edit opportunity");
             System.out.println("4. Toggle opportunity visibility");
             System.out.println("5. Review applications for an opportunity");
-            System.out.println("6. Generate simple report for my company");
+            // Report generation removed (career staff only)
             System.out.println("0. Logout");
             System.out.print("Enter choice: ");
 
@@ -69,9 +62,6 @@ public class CompanyRepCliMenu {
                     break;
                 case 5:
                     reviewApplications(rep);
-                    break;
-                case 6:
-                    generateReport(rep);
                     break;
                 case 0:
                     System.out.println("Logging out...");
@@ -187,7 +177,7 @@ public class CompanyRepCliMenu {
             System.out.printf("\n%d. %s (ID: %s)%n", i + 1, opp.getTitle(), opp.getOpportunityID());
             System.out.println("   Status: " + opp.getStatus());
             System.out.println("   Level: " + opp.getLevel());
-            System.out.println("   Slots: " + opp.getSlotCap());
+            System.out.println("   Slots (remaining/total): " + opp.getSlots() + "/" + opp.getSlotCap());
             System.out.println("   Visible: " + (opp.getVisible() ? "Yes" : "No"));
             System.out.println("   Open: " + opp.getOpenDate() + " | Close: " + opp.getCloseDate());
         }
@@ -328,7 +318,12 @@ public class CompanyRepCliMenu {
             Application app = applications.get(i);
             System.out.printf("\n%d. Student: %s%n", i + 1, app.getStudent().getUserId());
             System.out.println("   Status: " + app.getStatus());
-            System.out.println("   Confirmed by student: " + app.isAcceptedByStudent());
+            System.out.println("   Accepted by student: " + app.isAcceptedByStudent());
+            if (app.getStatus() == EntityClass.Enums.ApplicationStatus.Pending) {
+                System.out.println("   (Actionable)");
+            } else {
+                System.out.println("   (Final - no further actions)");
+            }
         }
         
         System.out.print("\nSelect application number to review (0 to cancel): ");
@@ -346,19 +341,24 @@ public class CompanyRepCliMenu {
         
         Application selectedApp = applications.get(appChoice - 1);
         
+        if (selectedApp.getStatus() != EntityClass.Enums.ApplicationStatus.Pending) {
+            System.out.println("This application is no longer actionable (status: " + selectedApp.getStatus() + ").");
+            return;
+        }
+
         System.out.println("\n1. Approve application");
         System.out.println("2. Reject application");
         System.out.print("Choice: ");
-        
+
         String action = scanner.nextLine().trim();
-        
+
         try {
             if ("1".equals(action)) {
                 applicationManager.repApprove(rep, selectedApp);
                 System.out.println("✓ Application approved! Student can now accept the offer.");
             } else if ("2".equals(action)) {
-                // Assuming there's a reject method, or we handle via status
-                System.out.println("Rejection feature - to be implemented via ApplicationManager");
+                applicationManager.repReject(rep, selectedApp);
+                System.out.println("✓ Application rejected.");
             } else {
                 System.out.println("Invalid choice.");
             }
@@ -367,11 +367,6 @@ public class CompanyRepCliMenu {
         }
     }
 
-    private void generateReport(CompanyRep rep) {
-        Map<String, String> filters = new HashMap<>();
-        filters.put("company", rep.getCompanyName());
-        String report = reportManager.generateReport(filters);
-        System.out.println(report);
-    }
+    // Report generation removed from CompanyRep interface (restricted to CareerStaff)
 }
 

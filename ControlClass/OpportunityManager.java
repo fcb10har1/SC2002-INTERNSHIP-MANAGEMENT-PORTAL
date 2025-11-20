@@ -67,7 +67,23 @@ public class OpportunityManager {
 
     // Listing
     public List<InternshipOpportunity> listVisibleFor(Student student) {
-        return opportunityRepository.findVisibleFor(student.getMajor(), student.getYearOfStudy());
+        // Apply eligibility rules explicitly: status Approved & visible, major match, level-year mapping, slots available
+        int year = student.getYearOfStudy();
+        String major = student.getMajor();
+        return opportunityRepository.findVisible().stream()
+                .filter(opp -> opp.getStatus() == OpportunityStatus.Approved && opp.isVisible())
+                .filter(opp -> opp.getPreferredMajor() == null || major.equalsIgnoreCase(opp.getPreferredMajor()))
+                .filter(opp -> {
+                    switch (opp.getLevel()) {
+                        case Basic: return year == 1; // Year 1 only
+                        case Intermediate: return year >= 2 && year <= 3; // Years 2-3
+                        case Advanced: return year >= 4; // Years 4-5 (assuming 5 possible)
+                        default: return false;
+                    }
+                })
+                .filter(opp -> opp.confirmedCount() < opp.getSlotCap())
+                .filter(opp -> student.getApplications().stream().noneMatch(app -> app.getTarget().equals(opp)))
+                .collect(java.util.stream.Collectors.toList());
     }
 
     public List<InternshipOpportunity> listOwnedOpps(CompanyRep rep) {
@@ -92,14 +108,16 @@ public class OpportunityManager {
         }
 
         InternshipLevel level = opportunity.getLevel();
+        int year = student.getYearOfStudy();
         switch (level) {
             case Basic:
+                if (year != 1) return false;
                 break;
             case Intermediate:
-                if (student.getYearOfStudy() < 2) return false;
+                if (year < 2 || year > 3) return false;
                 break;
             case Advanced:
-                if (student.getYearOfStudy() < 3) return false;
+                if (year < 4) return false; // Advanced only for year 4-5
                 break;
         }
 
