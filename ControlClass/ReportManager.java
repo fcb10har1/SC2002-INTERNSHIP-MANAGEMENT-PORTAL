@@ -13,12 +13,11 @@ import EntityClass.Enums.OpportunityStatus;
 // generating reports for career staff
 public class ReportManager {
 
-    private final OpportunityRepository opportunityRepository;
-    private final ApplicationRepository applicationRepository;
+    private final IOpportunityRepository opportunityRepository;
+    private final IApplicationRepository applicationRepository;
 
-    // hareesh implement
-    public ReportManager(OpportunityRepository oppRepo,
-                         ApplicationRepository appRepo) {
+    public ReportManager(IOpportunityRepository oppRepo,
+                         IApplicationRepository appRepo) {
         this.opportunityRepository = oppRepo;
         this.applicationRepository = appRepo;
     }

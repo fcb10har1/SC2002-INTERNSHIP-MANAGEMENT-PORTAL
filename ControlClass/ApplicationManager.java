@@ -5,29 +5,29 @@ import EntityClass.CompanyRep;
 import EntityClass.Enums.ApplicationStatus;
 import EntityClass.InternshipOpportunity;
 import EntityClass.Student;
-import Repository.IApplicationRepository;
-import Repository.IInternshipRepository;
+import RepositoryClass.IApplicationRepository;
+import RepositoryClass.IOpportunityRepository;
 
 public class ApplicationManager {
 
     private final IApplicationRepository applicationRepo;
-    private final IInternshipRepository internshipRepo;
+    private final IOpportunityRepository opportunityRepo;
 
     public ApplicationManager(IApplicationRepository applicationRepo,
-                              IInternshipRepository internshipRepo) {
+                              IOpportunityRepository opportunityRepo) {
         this.applicationRepo = applicationRepo;
-        this.internshipRepo = internshipRepo;
+        this.opportunityRepo = opportunityRepo;
     }
 
     // Student applies for an internship opportunity
     public Application apply(Student student, InternshipOpportunity opportunity) {
-        int count = applicationRepo.countByStudent(student);
+        int count = applicationRepo.findByStudent(student).size();
         if (count >= 5) {
             throw new IllegalStateException("Student has reached maximum number of applications (5).");
         }
 
         Application app = new Application(student, opportunity);
-        applicationRepo.save(app);   // or add(app)
+        applicationRepo.add(app);   
         return app;
     }
 
@@ -39,7 +39,7 @@ public class ApplicationManager {
         throw new IllegalStateException("Only PENDING applications can be approved.");
     }
         application.setStatus(ApplicationStatus.Successful);
-        applicationRepo.save(application);  
+        applicationRepo.update(application);  
     }
 
     // Student accepts an offer
@@ -53,7 +53,7 @@ public class ApplicationManager {
         application.setStatus(ApplicationStatus.Successful);
 
         // persist change
-        applicationRepo.save(application);
+        applicationRepo.update(application);
     }
 
     // Student rejects an offer
@@ -62,6 +62,6 @@ public class ApplicationManager {
             throw new IllegalStateException("Can only reject applications with status OFFERED.");
         }
         application.setStatus(ApplicationStatus.Unsuccessful);
-        applicationRepo.save(application);
+        applicationRepo.update(application);
     }
 }
