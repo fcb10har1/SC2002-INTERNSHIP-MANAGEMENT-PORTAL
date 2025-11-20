@@ -33,7 +33,7 @@ public class Application {
         return target;
     }
 
-    public boolean isconfirmed() {
+    public boolean isConfirmed() {
         return this.status == ApplicationStatus.Successful && this.acceptedByStudent;
     }
 

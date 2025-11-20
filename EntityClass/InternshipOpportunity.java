@@ -3,6 +3,8 @@ package EntityClass;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import EntityClass.Enums.InternshipLevel;
+import EntityClass.Enums.OpportunityStatus;
 
 class InternshipOpportunity {
     private String opportunityID;
@@ -119,3 +121,4 @@ class InternshipOpportunity {
     public void addApplication(Application app) {
         applications.add(app);
     }
+}
