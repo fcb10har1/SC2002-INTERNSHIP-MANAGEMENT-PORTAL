@@ -1,6 +1,7 @@
 package EntityClass;
 
 import java.util.List;
+import java.util.ArrayList;
 
 public class CompanyRep extends User {
     private String companyName;
