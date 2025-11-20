@@ -9,12 +9,12 @@ public class CompanyRep extends User {
     private List<InternshipOpportunity> opportunities;
     
     // shd opportunities be here in constructor?
-    public CompanyRep(String userID, String name, String companyName, String department, String position, List<InternshipOpportunity> opportunities) {
+    public CompanyRep(String userID, String name, String companyName, String department, String position) {
         super(userID, name);
         this.companyName = companyName;
         this.department = department;
         this.position = position;
-        this.opportunities = opportunities;
+        this.opportunities = new ArrayList<>();
     }
 
     public String getCompanyName() {
@@ -22,7 +22,7 @@ public class CompanyRep extends User {
     }
 
     public void setCompanyName(String companyName) {
-        this.companyName = companyName;
+        this.companyName = companyName; 
     }
 
     public String getDepartment() {

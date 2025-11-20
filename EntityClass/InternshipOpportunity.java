@@ -1,23 +1,26 @@
+package EntityClass;
+
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 class InternshipOpportunity {
-    String opportunityID;
-    String title;
-    String description;
-    String preferredMajor;
-    InternshipLevel level;
-    LocalDate openDate;
-    LocalDate closeDate;
-    OpportunityStatus status = OpportunityStatus.PENDING;
-    Boolean visible = false;
-    String companyName;
-    CompanyRep Owner;
-    int Slotcap;
-    List<Application> applications;
+    private String opportunityID;
+    private String title;
+    private String description;
+    private String preferredMajor;
+    private InternshipLevel level;
+    private LocalDate openDate;
+    private LocalDate closeDate;
+    private OpportunityStatus status = OpportunityStatus.Pending;
+    private boolean visible = false;
+    private String companyName;
+    private CompanyRep owner;
+    private int slotCap;
+    private List<Application> applications = new ArrayList<>();
 
     public InternshipOpportunity(String opportunityID, String title, String description, String preferredMajor,
-            InternshipLevel level, LocalDate openDate, LocalDate closeDate, String companyName, CompanyRep owner, int slotcap) {
+            InternshipLevel level, LocalDate openDate, LocalDate closeDate, String companyName, CompanyRep owner, int slotCap) {
         this.opportunityID = opportunityID;
         this.title = title;
         this.description = description;
@@ -26,8 +29,8 @@ class InternshipOpportunity {
         this.openDate = openDate;
         this.closeDate = closeDate;
         this.companyName = companyName;
-        this.Owner = owner;
-        this.Slotcap = slotcap;
+        this.owner = owner;
+        this.slotCap = slotCap;
     }
 
     public String getOpportunityID() {
@@ -62,7 +65,7 @@ class InternshipOpportunity {
         return status;
     }
 
-    public Boolean getVisible() {
+    public boolean getVisible() {
         return visible;
     }
 
@@ -71,11 +74,11 @@ class InternshipOpportunity {
     }
 
     public CompanyRep getOwner() {
-        return Owner;
+        return owner;
     }
 
-    public int getSlotcap() {
-        return Slotcap;
+    public int getSlotCap() {
+        return slotCap;
     }
 
     public List<Application> getApplications() {
@@ -86,27 +89,33 @@ class InternshipOpportunity {
         this.status = status;
     }       
 
-    public void setVisible(Boolean visible) {
+    public void setVisible(boolean visible) {
         this.visible = visible;
     }
 
-    public void slotsFilled() {
-        if (applications.size() >= Slotcap) {
-            this.status = OpportunityStatus.FILLED;
-        }
+    public boolean slotsFilled() {
+        return confirmedCount() >= slotCap;
     }
 
-    public setWindows(LocalDate openDate, LocalDate closeDate) {
+    public void setWindows(LocalDate openDate, LocalDate closeDate) {
         this.openDate = openDate;
         this.closeDate = closeDate;
     }
-
-    //why ah?
     
-    public setBasics(String title, String description, String preferredMajor, InternshipLevel level, int slotcap) {
+    public void setBasics(String title, String description, String preferredMajor, InternshipLevel level, int slotCap) {
         this.title = title;
         this.description = description;
         this.preferredMajor = preferredMajor;
         this.level = level;
-        this.Slotcap = slotcap;
+        this.slotCap = slotCap;
+    }
+
+    public long confirmedCount() {
+        return applications.stream()
+            .filter(Application::isConfirmed)
+            .count();
+    }
+
+    public void addApplication(Application app) {
+        applications.add(app);
     }
