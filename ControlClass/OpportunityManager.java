@@ -3,138 +3,126 @@ package ControlClass;
 import EntityClass.CareerStaff;
 import EntityClass.CompanyRep;
 import EntityClass.InternshipOpportunity;
+import EntityClass.Student;
 import EntityClass.Enums.OpportunityStatus;
+import EntityClass.Enums.InternshipLevel;
 import Repository.IOpportunityRepository;
 
 import java.util.List;
 
 public class OpportunityManager {
 
-    private final IOpportunityRepository oppRepo;
+    private final IOpportunityRepository opportunityRepository;
 
-    public OpportunityManager(IOpportunityRepository oppRepo) {
-        this.oppRepo = oppRepo;
+    public OpportunityManager(IOpportunityRepository opportunityRepository) {
+        this.opportunityRepository = opportunityRepository;
     }
 
-    // ---------------------------------------------------------
-    // Company Representative Actions
-    // ---------------------------------------------------------
+    // -----------------------------------------------------
+    // CompanyRep actions
+    // -----------------------------------------------------
 
-    /**
-     * CompanyRep creates a draft internship opportunity.
-     */
-    public void createDraft(CompanyRep rep,
-                            String title,
-                            String description,
-                            int vacancies,
-                            String level,
-                            String startDate,
-                            String endDate) {
-
-        InternshipOpportunity opp = new InternshipOpportunity(
-                title,
-                description,
-                rep,
-                vacancies,
-                level,
-                startDate,
-                endDate
-        );
-
-        opp.setStatus(OpportunityStatus.DRAFT);
-        oppRepo.save(opp);
+    public InternshipOpportunity createDraft(CompanyRep owner, String company, int slots) {
+        InternshipOpportunity opportunity = new InternshipOpportunity(owner, company, slots);
+        opportunity.setStatus(OpportunityStatus.Draft);
+        opportunity.setVisible(false); // drafts should not be visible
+        opportunityRepository.save(opportunity);
+        return opportunity;
     }
 
-    /**
-     * Submit a draft for approval (changes status from DRAFT → PENDING).
-     */
-    public void submitForApproval(CompanyRep rep, InternshipOpportunity opp) {
-        if (!opp.getOwner().equals(rep))
-            throw new IllegalStateException("You do not own this internship opportunity.");
-
-        if (opp.getStatus() != OpportunityStatus.DRAFT)
-            throw new IllegalStateException("Only DRAFT opportunities may be submitted.");
-
-        opp.setStatus(OpportunityStatus.PENDING);
-        oppRepo.save(opp);
+    public void submitForApproval(InternshipOpportunity opportunity) {
+        if (opportunity.getStatus() != OpportunityStatus.Draft) {
+            throw new IllegalStateException("Only Draft opportunities can be submitted.");
+        }
+        opportunity.setStatus(OpportunityStatus.Pending);
+        opportunity.setVisible(false);
+        opportunityRepository.update(opportunity);
     }
 
-    /**
-     * Edit an existing draft.
-     */
-    public void editDraft(CompanyRep rep,
-                          InternshipOpportunity opp,
-                          String title,
-                          String description,
-                          int vacancies,
-                          String level,
-                          String startDate,
-                          String endDate) {
-
-        if (!opp.getOwner().equals(rep))
-            throw new IllegalStateException("Only the owner may edit this draft.");
-
-        if (opp.getStatus() != OpportunityStatus.DRAFT)
-            throw new IllegalStateException("Only DRAFT opportunities can be edited.");
-
-        opp.setTitle(title);
-        opp.setDescription(description);
-        opp.setVacancies(vacancies);
-        opp.setLevel(level);
-        opp.setStartDate(startDate);
-        opp.setEndDate(endDate);
-
-        oppRepo.save(opp);
+    // Toggle visibility ONLY for approved opportunities
+    public void toggleVisibility(InternshipOpportunity opportunity) {
+        if (opportunity.getStatus() != OpportunityStatus.Approved) {
+            throw new IllegalStateException("Only approved opportunities can toggle visibility.");
+        }
+        opportunity.setVisible(!opportunity.isVisible());
+        opportunityRepository.update(opportunity);
     }
 
-    // ---------------------------------------------------------
-    // CareerStaff Approval Actions
-    // ---------------------------------------------------------
+    // -----------------------------------------------------
+    // CareerStaff actions
+    // -----------------------------------------------------
 
-    /**
-     * Staff approves an opportunity (PENDING → APPROVED).
-     */
-    public void approve(CareerStaff staff, InternshipOpportunity opp) {
-        if (opp.getStatus() != OpportunityStatus.PENDING)
-            throw new IllegalStateException("Only PENDING opportunities can be approved.");
-
-        opp.setStatus(OpportunityStatus.APPROVED);
-        oppRepo.save(opp);
+    public void approve(CareerStaff staff, InternshipOpportunity io) {
+        if (io.getStatus() != OpportunityStatus.Pending) {
+            throw new IllegalStateException("Only Pending opportunities can be approved.");
+        }
+        io.setStatus(OpportunityStatus.Approved);
+        io.setReviewedBy(staff);
+        io.setVisible(true);
+        opportunityRepository.update(io);
     }
 
-    /**
-     * Staff rejects an opportunity (PENDING → REJECTED).
-     */
-    public void reject(CareerStaff staff, InternshipOpportunity opp) {
-        if (opp.getStatus() != OpportunityStatus.PENDING)
-            throw new IllegalStateException("Only PENDING opportunities can be rejected.");
-
-        opp.setStatus(OpportunityStatus.REJECTED);
-        oppRepo.save(opp);
+    public void reject(CareerStaff staff, InternshipOpportunity io) {
+        if (io.getStatus() != OpportunityStatus.Pending) {
+            throw new IllegalStateException("Only Pending opportunities can be rejected.");
+        }
+        io.setStatus(OpportunityStatus.Rejected);
+        io.setReviewedBy(staff);
+        io.setVisible(false);
+        opportunityRepository.update(io);
     }
 
-    // ---------------------------------------------------------
-    // Listing & Viewing Methods
-    // ---------------------------------------------------------
+    // -----------------------------------------------------
+    // Listing
+    // -----------------------------------------------------
 
-    /**
-     * List all opportunities with PUBLIC = true.
-     */
-    public List<InternshipOpportunity> listVisibleOpps() {
-        return oppRepo.findVisible();
+    public List<InternshipOpportunity> listVisibleFor(Student student) {
+        return opportunityRepository.findVisibleForStudent(student);
     }
 
-    /**
-     * List all opportunities that belong to the logged-in company rep.
-     */
-    public List<InternshipOpportunity> listOwnedOpps(CompanyRep rep) {
-        return oppRepo.findByOwner(rep);
-    }
+    // -----------------------------------------------------
+    // Eligibility check
+    // -----------------------------------------------------
 
-    /**
-     * For CareerStaff – view all draft and pending opportunities.
-     */
-    public List<InternshipOpportunity> listPendingOpps() {
-        return oppRepo.findByStatus(OpportunityStatus.PENDING);
+    public boolean checkEligibility(InternshipOpportunity opportunity, Student student) {
+
+        // 1. Must be approved & visible
+        if (opportunity.getStatus() != OpportunityStatus.Approved || !opportunity.isVisible()) {
+            return false;
+        }
+
+        // 2. Student has already applied for this same opportunity
+        if (student.getApplications().stream()
+                .anyMatch(app -> app.getOpportunity().equals(opportunity))) {
+            return false;
+        }
+
+        // 3. Max 5 applications rule
+        if (student.getApplications().size() >= 5) {
+            return false;
+        }
+
+        // 4. Check level requirement (your enum is Basic/Intermediate/Advanced)
+        InternshipLevel level = opportunity.getLevel();
+
+        switch (level) {
+            case Basic:
+                break; // everyone can apply
+
+            case Intermediate:
+                if (student.getYearOfStudy() < 2) return false;
+                break;
+
+            case Advanced:
+                if (student.getYearOfStudy() < 3) return false;
+                break;
+        }
+
+        // 5. Check slots
+        if (opportunity.getSlots() <= 0) {
+            return false;
+        }
+
+        return true;
     }
 }
