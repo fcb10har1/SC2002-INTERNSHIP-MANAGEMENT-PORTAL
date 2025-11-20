@@ -70,6 +70,14 @@ public class OpportunityManager {
         return opportunityRepository.findVisibleFor(student.getMajor(), student.getYearOfStudy());
     }
 
+    public List<InternshipOpportunity> listOwnedOpps(CompanyRep rep) {
+        return opportunityRepository.findByOwner(rep);
+    }
+
+    public IOpportunityRepository getRepository() {
+        return opportunityRepository;
+    }
+
     // Eligibility check – simplified
     public boolean checkEligibility(InternshipOpportunity opportunity, Student student) {
         if (opportunity.getStatus() != OpportunityStatus.Approved || !opportunity.getVisible()) {

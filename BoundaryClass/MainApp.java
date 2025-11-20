@@ -58,12 +58,32 @@ public class MainApp {
 
         // auth + login UI
         AuthService authService = new AuthService(userRepository);
-        loginUI = new LoginUI(authService, scanner);
+        loginUI = new LoginUI(authService, userManager, scanner);
 
         // menus
         studentMenu = new StudentCliMenu(scanner, applicationManager, opportunityManager, withdrawalManager);
         companyRepMenu = new CompanyRepCliMenu(scanner, applicationManager, opportunityManager, reportManager);
         careerStaffMenu = new CareerStaffCliMenu(scanner, opportunityManager, withdrawalManager, reportManager, userManager);
+
+        // seed demo users for testing
+        seedDemoUsers();
+    }
+
+    private void seedDemoUsers() {
+        // Create demo users - all with default password "password"
+        Student student = new Student("s001", "Alice Student", 2, "Computer Science");
+        CompanyRep companyRep = new CompanyRep("c001", "Bob CompanyRep", "TechCorp", "Engineering", "HR Manager");
+        CareerStaff careerStaff = new CareerStaff("cs001", "Carol Staff", "Career Services");
+
+        userRepository.add(student);
+        userRepository.add(companyRep);
+        userRepository.add(careerStaff);
+
+        System.out.println("Demo users created:");
+        System.out.println("  Student:     ID=s001,  password=password");
+        System.out.println("  CompanyRep:  ID=c001,  password=password");
+        System.out.println("  CareerStaff: ID=cs001, password=password");
+        System.out.println();
     }
 
     public void startCLI() {

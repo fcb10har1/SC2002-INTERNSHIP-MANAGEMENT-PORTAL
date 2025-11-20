@@ -1,13 +1,19 @@
 package RepositoryClass;
 
+import EntityClass.CompanyRep;
+import EntityClass.InternshipOpportunity;
+import EntityClass.Enums.OpportunityStatus;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import EntityClass.InternshipOpportunity;
 
 public class OpportunityRepository implements IOpportunityRepository {
 
     private final Map<String, InternshipOpportunity> store = new HashMap<>();
+
+    @Override
+    public void save(InternshipOpportunity io) {
+        store.put(io.getOpportunityID(), io);
+    }
 
     @Override
     public void add(InternshipOpportunity io) {
@@ -35,5 +41,31 @@ public class OpportunityRepository implements IOpportunityRepository {
     @Override
     public List<InternshipOpportunity> all() {
         return new ArrayList<>(store.values());
+    }
+
+    @Override
+    public List<InternshipOpportunity> findVisible() {
+        return store.values().stream()
+            .filter(InternshipOpportunity::getVisible)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<InternshipOpportunity> findByOwner(CompanyRep owner) {
+        return store.values().stream()
+            .filter(opp -> opp.getOwner().equals(owner))
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<InternshipOpportunity> findByStatus(OpportunityStatus status) {
+        return store.values().stream()
+            .filter(opp -> opp.getStatus() == status)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public void delete(String opportunityID) {
+        store.remove(opportunityID);
     }
 }
