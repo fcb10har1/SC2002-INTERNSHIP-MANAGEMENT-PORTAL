@@ -219,6 +219,9 @@ public class CareerStaffCliMenu {
         }
     }
     
+    /*
+     * Approve or reject pending internship opportunities.
+     */
     private void approvePendingOpportunities(CareerStaff staff) {
         List<InternshipOpportunity> pendingOpps = 
             opportunityManager.getRepository().findByStatus(OpportunityStatus.Pending);
@@ -278,6 +281,9 @@ public class CareerStaffCliMenu {
         }
     }
     
+    /*
+     * Allows the career staff to configure filter settings for viewing opportunities.
+     */
     private void configureFilters() {
         System.out.println("\n=== Configure Filters ===");
         

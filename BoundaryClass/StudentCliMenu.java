@@ -166,7 +166,9 @@ public class StudentCliMenu {
         }
     }
     
-<<<<<<< HEAD
+    /*     
+     * Allows the student to configure filter settings for viewing opportunities.
+     */
     private void configureFilters() {
         System.out.println("\n=== Configure Filters ===");
         
@@ -215,11 +217,9 @@ public class StudentCliMenu {
         System.out.println("\n✓ Filters configured: " + filterSettings.getSummary());
     }
 
-=======
     /*     
      * Displays the student's applications.
      */
->>>>>>> origin/main
     private void viewMyApplications(Student student) {
         List<Application> apps = student.getApplications();
         

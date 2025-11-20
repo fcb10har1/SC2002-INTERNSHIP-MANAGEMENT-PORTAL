@@ -13,6 +13,9 @@ public class CompanyRep extends User {
     private String position;
     private List<InternshipOpportunity> opportunities;
     
+    /**
+     * Creates a new company representative with the given details.
+     */
     public CompanyRep(String userID, String name, String email, String companyName, String department, String position) {
         super(userID, name, email);
         this.companyName = companyName;

@@ -12,6 +12,9 @@ import java.io.IOException;
  * Handles importing and exporting of data in CSV format
  */
 public class CSVImporter {
+    /*
+     * Imports students from a CSV file into the user repository
+     */
     public static int importStudents(String filePath, IUserRepository userRepo) {
         int count = 0;
         
@@ -64,9 +67,8 @@ public class CSVImporter {
         return count;
     }
 
-    /**
-     * Import career staff from CSV file
-     * CSV format: StaffID,Name,Role,Department,Email
+    /*
+     * Imports career staff from a CSV file into the user repository
      */
     public static int importCareerStaff(String filePath, IUserRepository userRepo) {
         int count = 0;
@@ -118,8 +120,8 @@ public class CSVImporter {
         return count;
     }
 
-    /**
-     * Export a CompanyRep to CSV file (append mode)
+    /*
+     * Exports a CompanyRep to a CSV file in append mode
      */
     public static boolean exportCompanyRep(String filePath, EntityClass.CompanyRep companyRep) {
         try (java.io.FileWriter fw = new java.io.FileWriter(filePath, true);
@@ -144,9 +146,8 @@ public class CSVImporter {
         }
     }
 
-    /**
-     * Import company representatives from CSV file
-     * CSV format: CompanyRepID,Name,Email,CompanyName,Department,Position
+    /*
+     * Imports company representatives from a CSV file into the user repository
      */
     public static int importCompanyReps(String filePath, IUserRepository userRepo) {
         int count = 0;
