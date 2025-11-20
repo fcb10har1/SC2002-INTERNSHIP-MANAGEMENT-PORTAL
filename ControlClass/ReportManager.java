@@ -24,6 +24,9 @@ public class ReportManager {
         this.applicationRepository = appRepo;
     }
 
+    /*
+     * Generates a report based on the provided filter criteria
+     */
     public String generateReport(Map<String, String> filters) {
         List<InternshipOpportunity> opportunities = opportunityRepository.all();
 
@@ -163,7 +166,9 @@ public class ReportManager {
     return sb.toString();
     }
 
-    // Filtered composite report with aggregates limited to filtered subset
+    /*
+     * Generates a filtered composite report with aggregates limited to the filtered subset
+     */
     public String generateFilteredCompositeReport(Map<String,String> filters) {
         List<InternshipOpportunity> base = opportunityRepository.all();
         java.util.stream.Stream<InternshipOpportunity> stream = base.stream();

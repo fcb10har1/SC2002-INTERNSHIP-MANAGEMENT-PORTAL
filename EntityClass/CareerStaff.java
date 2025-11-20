@@ -6,6 +6,9 @@ package EntityClass;
 public class CareerStaff extends User {
     private String department;
 
+    /**
+     * Creates a new career staff member with the given details.
+     */
     public CareerStaff(String userID, String name, String email, String department) {
         super(userID, name, email);
         this.department = department;

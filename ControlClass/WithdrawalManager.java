@@ -92,6 +92,9 @@ public class WithdrawalManager {
         System.out.println("Withdrawal request " + requestId + " rejected by " + staff.getUserId());
     }
 
+    /*
+     * Returns all withdrawal requests
+     */
     public List<WithdrawalRequest> getAllRequests() {
         return new ArrayList<>(requests);
     }

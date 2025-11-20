@@ -237,6 +237,9 @@ public class CompanyRepCliMenu {
         }
     }
     
+    /*
+     * Allows the company representative to configure filter settings for viewing opportunities.
+     */
     private void configureFilters() {
         System.out.println("\n=== Configure Filters ===");
         
