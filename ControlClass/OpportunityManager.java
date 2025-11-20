@@ -6,7 +6,7 @@ import EntityClass.InternshipOpportunity;
 import EntityClass.Student;
 import EntityClass.Enums.OpportunityStatus;
 import EntityClass.Enums.InternshipLevel;
-import Repository.IOpportunityRepository;
+import RepositoryClass.IOpportunityRepository;
 
 import java.util.List;
 
@@ -18,15 +18,14 @@ public class OpportunityManager {
         this.opportunityRepository = opportunityRepository;
     }
 
-    // -----------------------------------------------------
     // CompanyRep actions
-    // -----------------------------------------------------
-
     public InternshipOpportunity createDraft(CompanyRep owner, String company, int slots) {
-        InternshipOpportunity opportunity = new InternshipOpportunity(owner, company, slots);
+        InternshipOpportunity opportunity =
+                new InternshipOpportunity(/*id*/ "", "", "", null,
+                        InternshipLevel.Basic, null, null, company, owner, slots);
         opportunity.setStatus(OpportunityStatus.Draft);
-        opportunity.setVisible(false); // drafts should not be visible
-        opportunityRepository.save(opportunity);
+        opportunity.setVisible(false);
+        opportunityRepository.add(opportunity);
         return opportunity;
     }
 
@@ -39,25 +38,20 @@ public class OpportunityManager {
         opportunityRepository.update(opportunity);
     }
 
-    // Toggle visibility ONLY for approved opportunities
     public void toggleVisibility(InternshipOpportunity opportunity) {
         if (opportunity.getStatus() != OpportunityStatus.Approved) {
             throw new IllegalStateException("Only approved opportunities can toggle visibility.");
         }
-        opportunity.setVisible(!opportunity.isVisible());
+        opportunity.setVisible(!opportunity.getVisible());
         opportunityRepository.update(opportunity);
     }
 
-    // -----------------------------------------------------
     // CareerStaff actions
-    // -----------------------------------------------------
-
     public void approve(CareerStaff staff, InternshipOpportunity io) {
         if (io.getStatus() != OpportunityStatus.Pending) {
             throw new IllegalStateException("Only Pending opportunities can be approved.");
         }
         io.setStatus(OpportunityStatus.Approved);
-        io.setReviewedBy(staff);
         io.setVisible(true);
         opportunityRepository.update(io);
     }
@@ -67,59 +61,41 @@ public class OpportunityManager {
             throw new IllegalStateException("Only Pending opportunities can be rejected.");
         }
         io.setStatus(OpportunityStatus.Rejected);
-        io.setReviewedBy(staff);
         io.setVisible(false);
         opportunityRepository.update(io);
     }
 
-    // -----------------------------------------------------
     // Listing
-    // -----------------------------------------------------
-
     public List<InternshipOpportunity> listVisibleFor(Student student) {
-        return opportunityRepository.findVisibleForStudent(student);
+        return opportunityRepository.findVisibleFor(student.getMajor(), student.getYearOfStudy());
     }
 
-    // -----------------------------------------------------
-    // Eligibility check
-    // -----------------------------------------------------
-
+    // Eligibility check – simplified
     public boolean checkEligibility(InternshipOpportunity opportunity, Student student) {
-
-        // 1. Must be approved & visible
-        if (opportunity.getStatus() != OpportunityStatus.Approved || !opportunity.isVisible()) {
+        if (opportunity.getStatus() != OpportunityStatus.Approved || !opportunity.getVisible()) {
             return false;
         }
-
-        // 2. Student has already applied for this same opportunity
         if (student.getApplications().stream()
-                .anyMatch(app -> app.getOpportunity().equals(opportunity))) {
+                .anyMatch(app -> app.getTarget().equals(opportunity))) {
             return false;
         }
-
-        // 3. Max 5 applications rule
         if (student.getApplications().size() >= 5) {
             return false;
         }
 
-        // 4. Check level requirement (your enum is Basic/Intermediate/Advanced)
         InternshipLevel level = opportunity.getLevel();
-
         switch (level) {
             case Basic:
-                break; // everyone can apply
-
+                break;
             case Intermediate:
                 if (student.getYearOfStudy() < 2) return false;
                 break;
-
             case Advanced:
                 if (student.getYearOfStudy() < 3) return false;
                 break;
         }
 
-        // 5. Check slots
-        if (opportunity.getSlots() <= 0) {
+        if (opportunity.confirmedCount() >= opportunity.getSlotCap()) {
             return false;
         }
 

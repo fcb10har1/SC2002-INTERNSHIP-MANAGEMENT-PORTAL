@@ -1,23 +1,21 @@
 package BoundaryClass;
 
-import EntityClass.User;
 import ControlClass.ApplicationManager;
+import ControlClass.AuthService;
 import ControlClass.OpportunityManager;
 import ControlClass.ReportManager;
 import ControlClass.UserManager;
 import ControlClass.WithdrawalManager;
-import ControlClass.AuthService;
-
-import EntityClass.Student;
-import EntityClass.CompanyRep;
 import EntityClass.CareerStaff;
-
-import RepositoryClass.IUserRepository;
-import RepositoryClass.UserRepository;
-import RepositoryClass.IOpportunityRepository;
-import RepositoryClass.OpportunityRepository;
+import EntityClass.CompanyRep;
+import EntityClass.Student;
+import EntityClass.User;
 import RepositoryClass.IApplicationRepository;
+import RepositoryClass.IOpportunityRepository;
+import RepositoryClass.IUserRepository;
 import RepositoryClass.ApplicationRepository;
+import RepositoryClass.OpportunityRepository;
+import RepositoryClass.UserRepository;
 
 import java.util.Optional;
 import java.util.Scanner;
@@ -51,8 +49,9 @@ public class MainApp {
     private final ReportManager reportManager;
 
     public MainApp() {
+        // managers
         userManager = new UserManager(userRepository);
-        opportunityManager = new OpportunityManager(opportunityRepository, userRepository); // assuming this ctor
+        opportunityManager = new OpportunityManager(opportunityRepository);
         applicationManager = new ApplicationManager(applicationRepository, opportunityRepository);
         withdrawalManager = new WithdrawalManager();
         reportManager = new ReportManager(opportunityRepository, applicationRepository);
@@ -71,7 +70,7 @@ public class MainApp {
         System.out.println("Welcome to the Internship Placement Management System!");
 
         while (true) {
-            Optional<User> loggedIn = loginUI.promptLogin();   // ✅ no args
+            Optional<User> loggedIn = loginUI.promptLogin();  // no param
             if (!loggedIn.isPresent()) {
                 System.out.println("Exiting system.");
                 break;
@@ -87,8 +86,7 @@ public class MainApp {
             } else if (user instanceof CareerStaff) {
                 careerStaffMenu.showOptions((CareerStaff) user);
             }
-
-            // after menu returns, loop back to login
+            // then loop back to login
         }
     }
 }
