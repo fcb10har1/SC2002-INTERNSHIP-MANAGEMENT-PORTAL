@@ -3,10 +3,11 @@ package EntityClass;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
 import EntityClass.Enums.InternshipLevel;
 import EntityClass.Enums.OpportunityStatus;
 
-class InternshipOpportunity {
+public class InternshipOpportunity {
     private String opportunityID;
     private String title;
     private String description;
