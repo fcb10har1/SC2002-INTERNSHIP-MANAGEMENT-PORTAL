@@ -40,6 +40,7 @@ public class CareerStaffCliMenu {
             System.out.println("2. Approve/reject opportunities");
             System.out.println("3. Approve/reject withdrawal requests");
             System.out.println("4. Generate reports");
+            System.out.println("5. Change password");
             System.out.println("0. Logout");
             System.out.print("Enter choice: ");
 
@@ -61,6 +62,12 @@ public class CareerStaffCliMenu {
                     break;
                 case 4:
                     generateReports();
+                    break;
+                case 5:
+                    if (changePassword(staff)) {
+                        System.out.println("Password changed successfully. Please log in again with your new password.");
+                        return; // Force logout
+                    }
                     break;
                 case 0:
                     System.out.println("Logging out...");
@@ -230,5 +237,36 @@ public class CareerStaffCliMenu {
         } else {
             System.out.println("Invalid choice.");
         }
+    }
+
+    private boolean changePassword(CareerStaff staff) {
+        System.out.println("\n=== Change Password ===");
+        System.out.print("Enter current password: ");
+        String currentPassword = scanner.nextLine().trim();
+        
+        // Verify current password
+        if (!staff.login(staff.getUserId(), currentPassword)) {
+            System.out.println("Error: Current password is incorrect.");
+            return false;
+        }
+        
+        System.out.print("Enter new password: ");
+        String newPassword = scanner.nextLine().trim();
+        
+        if (newPassword.isEmpty()) {
+            System.out.println("Error: Password cannot be empty.");
+            return false;
+        }
+        
+        System.out.print("Confirm new password: ");
+        String confirmPassword = scanner.nextLine().trim();
+        
+        if (!newPassword.equals(confirmPassword)) {
+            System.out.println("Error: Passwords do not match.");
+            return false;
+        }
+        
+        staff.changePassword(newPassword);
+        return true;
     }
 }
