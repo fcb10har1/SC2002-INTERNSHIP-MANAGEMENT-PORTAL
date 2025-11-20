@@ -2,8 +2,11 @@ package ControlClass;
 
 import EntityClass.Application;
 import EntityClass.InternshipOpportunity;
-import EntityClass.InternshipLevel;
-import EntityClass.OpportunityStatus;
+import EntityClass.Enums.InternshipLevel;
+import EntityClass.Enums.OpportunityStatus;
+
+import RepositoryClass.IOpportunityRepository;
+import RepositoryClass.IApplicationRepository;
 
 import java.util.List;
 import java.util.Map;
@@ -12,12 +15,11 @@ import java.util.stream.Collectors;
 // generating reports for career staff
 public class ReportManager {
 
-    private final OpportunityRepository opportunityRepository;
-    private final ApplicationRepository applicationRepository;
+    private final IOpportunityRepository opportunityRepository;
+    private final IApplicationRepository applicationRepository;
 
-    // hareesh implement
-    public ReportManager(OpportunityRepository oppRepo,
-                         ApplicationRepository appRepo) {
+    public ReportManager(IOpportunityRepository oppRepo,
+                         IApplicationRepository appRepo) {
         this.opportunityRepository = oppRepo;
         this.applicationRepository = appRepo;
     }
