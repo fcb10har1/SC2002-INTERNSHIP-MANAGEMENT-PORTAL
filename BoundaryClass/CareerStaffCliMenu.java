@@ -18,8 +18,10 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-/*
- * CLI menu for Career Staff users to manage company representatives,
+/**
+ * CLI menu for Career Staff users to approve/reject company representatives and
+ * internship opportunities, process withdrawal requests, generate reports and
+ * configure persistent filters.
  */
 public class CareerStaffCliMenu {
 
@@ -30,8 +32,13 @@ public class CareerStaffCliMenu {
     private final UserManager userManager;
     private FilterSettings filterSettings = new FilterSettings(); // Persists across menu navigation
 
-    /*
-     * Constructor for CareerStaffCliMenu.
+    /**
+     * Constructs the career staff CLI menu with required managers and input scanner.
+     * @param scanner interactive input source
+     * @param oppMgr opportunity manager
+     * @param wdMgr withdrawal manager
+     * @param reportMgr report manager
+     * @param userMgr user manager
      */
     public CareerStaffCliMenu(Scanner scanner,
                               OpportunityManager oppMgr,
@@ -45,8 +52,9 @@ public class CareerStaffCliMenu {
         this.userManager = userMgr;
     }
 
-    /*
+    /**
      * Displays the Career Staff menu and handles user input.
+     * @param staff the logged-in career staff member
      */
     public void showOptions(CareerStaff staff) {
         int choice;
@@ -94,8 +102,9 @@ public class CareerStaffCliMenu {
         } while (choice != 0);
     }
 
-    /*
-     * Approve or reject company representatives.
+    /**
+     * Displays company representatives and allows approving or rejecting selected ones.
+     * @param staff the logged-in career staff user
      */
     private void approveRejectCompanyReps(CareerStaff staff) {
         IUserRepository userRepo = userManager.getUserRepository();
@@ -162,8 +171,9 @@ public class CareerStaffCliMenu {
         }
     }
 
-    /*
-     * Approve or reject internship opportunities.
+    /**
+     * Handles viewing internship opportunities with optional filters or directs to pending approvals.
+     * @param staff the logged-in career staff user
      */
     private void approveRejectOpportunities(CareerStaff staff) {
         // Filter options
@@ -219,8 +229,9 @@ public class CareerStaffCliMenu {
         }
     }
     
-    /*
-     * Approve or reject pending internship opportunities.
+    /**
+     * Lists pending opportunities and performs approval or rejection.
+     * @param staff the logged-in career staff user
      */
     private void approvePendingOpportunities(CareerStaff staff) {
         List<InternshipOpportunity> pendingOpps = 
@@ -281,8 +292,8 @@ public class CareerStaffCliMenu {
         }
     }
     
-    /*
-     * Allows the career staff to configure filter settings for viewing opportunities.
+    /**
+     * Configures persistent filter settings applied when listing opportunities.
      */
     private void configureFilters() {
         System.out.println("\n=== Configure Filters ===");
@@ -332,8 +343,8 @@ public class CareerStaffCliMenu {
         System.out.println("\n✓ Filters configured: " + filterSettings.getSummary());
     }
 
-    /*
-     * Generate comprehensive internship opportunities report.
+    /**
+     * Generates filtered and/or comprehensive reports about internship opportunities and applications.
      */
     private void generateReports() {
         System.out.println("\n=== Generate & Filter Internship Report ===");
@@ -385,8 +396,9 @@ public class CareerStaffCliMenu {
         }
     }
 
-    /*
-     * Approve or reject withdrawal requests.
+    /**
+     * Reviews pending withdrawal requests and approves or rejects the selected one.
+     * @param staff the logged-in career staff user
      */
     private void approveRejectWithdrawals(CareerStaff staff) {
         List<EntityClass.WithdrawalRequest> pending = withdrawalManager.getAllRequests().stream()
@@ -422,8 +434,10 @@ public class CareerStaffCliMenu {
         }
     }
 
-    /*
-     * Change password for the Career Staff user.
+    /**
+     * Changes the password for the career staff user after validation.
+     * @param staff the logged-in career staff user
+     * @return true if password changed (logout required), false otherwise
      */
     private boolean changePassword(CareerStaff staff) {
         System.out.println("\n=== Change Password ===");

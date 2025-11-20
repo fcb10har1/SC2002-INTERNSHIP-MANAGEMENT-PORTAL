@@ -10,20 +10,29 @@ import RepositoryClass.IOpportunityRepository;
 
 import java.util.List;
 
-/*
- * Manages internship opportunities between CompanyReps, CareerStaff, and Students
+/**
+ * Manages lifecycle operations for internship opportunities including draft
+ * creation, submission, approval/rejection, visibility toggling and eligibility checks.
  */
 public class OpportunityManager {
 
     private final IOpportunityRepository opportunityRepository;
 
+    /**
+     * Constructs an OpportunityManager with the given repository.
+     * @param opportunityRepository repository for opportunities
+     */
     public OpportunityManager(IOpportunityRepository opportunityRepository) {
         this.opportunityRepository = opportunityRepository;
     }
 
-    /*
-    * CompanyRep creates a draft internship opportunity
-    */
+    /**
+     * Creates a new draft internship opportunity owned by the given company representative.
+     * @param owner the owning company representative
+     * @param company the company name
+     * @param slots total available slots (cap)
+     * @return the created draft InternshipOpportunity
+     */
     public InternshipOpportunity createDraft(CompanyRep owner, String company, int slots) {
         InternshipOpportunity opportunity =
                 new InternshipOpportunity(/*id*/ "", "", "", null,
@@ -34,8 +43,10 @@ public class OpportunityManager {
         return opportunity;
     }
 
-    /*
-     * CompanyRep submits a draft internship opportunity for approval
+    /**
+     * Submits a draft internship opportunity for approval.
+     * @param opportunity the draft opportunity
+     * @throws IllegalStateException if the opportunity is not in Draft status
      */
     public void submitForApproval(InternshipOpportunity opportunity) {
         if (opportunity.getStatus() != OpportunityStatus.Draft) {
@@ -46,8 +57,10 @@ public class OpportunityManager {
         opportunityRepository.update(opportunity);
     }
 
-    /*
-     * CompanyRep toggles visibility of an approved internship opportunity
+    /**
+     * Toggles visibility of an approved internship opportunity.
+     * @param opportunity the approved opportunity to toggle
+     * @throws IllegalStateException if opportunity not Approved
      */
     public void toggleVisibility(InternshipOpportunity opportunity) {
         if (opportunity.getStatus() != OpportunityStatus.Approved) {
@@ -57,8 +70,11 @@ public class OpportunityManager {
         opportunityRepository.update(opportunity);
     }
 
-    /*
-     * CareerStaff approves a pending internship opportunity
+    /**
+     * Approves a pending internship opportunity making it visible.
+     * @param staff approving career staff member
+     * @param io the pending opportunity
+     * @throws IllegalStateException if status not Pending
      */
     public void approve(CareerStaff staff, InternshipOpportunity io) {
         if (io.getStatus() != OpportunityStatus.Pending) {
@@ -69,8 +85,11 @@ public class OpportunityManager {
         opportunityRepository.update(io);
     }
 
-    /*
-     * CareerStaff rejects a pending internship opportunity
+    /**
+     * Rejects a pending internship opportunity.
+     * @param staff rejecting career staff member
+     * @param io the pending opportunity
+     * @throws IllegalStateException if status not Pending
      */
     public void reject(CareerStaff staff, InternshipOpportunity io) {
         if (io.getStatus() != OpportunityStatus.Pending) {
@@ -81,8 +100,10 @@ public class OpportunityManager {
         opportunityRepository.update(io);
     }
 
-    /*
-     * Lists internship opportunities visible to a student based on eligibility
+    /**
+     * Returns a list of approved, visible internship opportunities the student is eligible to apply for.
+     * @param student student whose eligibility is evaluated
+     * @return list of eligible opportunities
      */
     public List<InternshipOpportunity> listVisibleFor(Student student) {
         // Apply eligibility rules explicitly: status Approved & visible, major match, level-year mapping, slots available
@@ -107,21 +128,27 @@ public class OpportunityManager {
                 .filter(opp -> student.getApplications().stream().noneMatch(app -> app.getTarget().equals(opp)))
                 .collect(java.util.stream.Collectors.toList());
     }
-    /*
-     * Lists internship opportunities owned by a CompanyRep
+    /**
+     * Returns a list of opportunities owned by the given company representative (any status).
+     * @param rep owner representative
+     * @return list of owned opportunities
      */
     public List<InternshipOpportunity> listOwnedOpps(CompanyRep rep) {
         return opportunityRepository.findByOwner(rep);
     }
-    /*
-     * Gets the opportunity repository
+    /**
+     * Returns the backing opportunity repository.
+     * @return opportunity repository
      */
     public IOpportunityRepository getRepository() {
         return opportunityRepository;
     }
 
-    /*
-     * Checks if a student is eligible to apply for a given internship opportunity
+    /**
+     * Checks if a student is eligible to apply for the specified opportunity.
+     * @param opportunity target opportunity
+     * @param student candidate student
+     * @return true if eligible, false otherwise
      */
     public boolean checkEligibility(InternshipOpportunity opportunity, Student student) {
         if (opportunity.getStatus() != OpportunityStatus.Approved || !opportunity.getVisible()) {

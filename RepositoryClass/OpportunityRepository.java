@@ -6,39 +6,46 @@ import EntityClass.Enums.OpportunityStatus;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/*
- * OpportunityRepository provides in-memory storage and retrieval of InternshipOpportunity entities.
+/**
+ * In-memory repository for InternshipOpportunity entities with various query helpers.
  */
 public class OpportunityRepository implements IOpportunityRepository {
 
     private final Map<String, InternshipOpportunity> store = new HashMap<>();
 
-    /*     
-     * Saves an InternshipOpportunity to the repository.
+    /**
+     * Saves an internship opportunity, overwriting prior state.
+     * @param io opportunity instance
      */
     @Override
     public void save(InternshipOpportunity io) {
         store.put(io.getOpportunityID(), io);
     }
 
-    /*     
-     * Adds a new InternshipOpportunity to the repository.
+    /**
+     * Adds a new internship opportunity (alias of save).
+     * @param io opportunity instance
      */
     @Override
     public void add(InternshipOpportunity io) {
         store.put(io.getOpportunityID(), io);
     }
 
-    /*     
-     * Finds an InternshipOpportunity by its ID.
+    /**
+     * Finds an internship opportunity by id.
+     * @param id opportunity id
+     * @return optional opportunity
      */
     @Override
     public Optional<InternshipOpportunity> findById(String id) {
         return Optional.ofNullable(store.get(id));
     }
 
-    /*     
-     * Finds all visible InternshipOpportunities for a given major and year.
+    /**
+     * Finds visible opportunities for a major/year.
+     * @param major preferred major or null for any
+     * @param year academic year (currently not filtered)
+     * @return list of visible opportunities
      */
     @Override
     public List<InternshipOpportunity> findVisibleFor(String major, int year) {
@@ -48,24 +55,27 @@ public class OpportunityRepository implements IOpportunityRepository {
                 .collect(Collectors.toList());
     }
 
-    /*     
-     * Updates an existing InternshipOpportunity in the repository.
+    /**
+     * Updates existing opportunity state.
+     * @param io opportunity instance
      */
     @Override
     public void update(InternshipOpportunity io) {
         store.put(io.getOpportunityID(), io);
     }
 
-    /*     
-     * Retrieves all InternshipOpportunities in the repository.
+    /**
+     * Returns all stored opportunities.
+     * @return list of opportunities
      */
     @Override
     public List<InternshipOpportunity> all() {
         return new ArrayList<>(store.values());
     }
 
-    /*     
-     * Finds all visible InternshipOpportunities.
+    /**
+     * Returns all currently visible opportunities.
+     * @return list of visible opportunities
      */
     @Override
     public List<InternshipOpportunity> findVisible() {
@@ -74,8 +84,10 @@ public class OpportunityRepository implements IOpportunityRepository {
             .collect(Collectors.toList());
     }
 
-    /*     
-     * Finds all InternshipOpportunities owned by a specific CompanyRep.
+    /**
+     * Finds opportunities owned by the given company representative.
+     * @param owner representative
+     * @return list of owned opportunities
      */
     @Override
     public List<InternshipOpportunity> findByOwner(CompanyRep owner) {
@@ -84,8 +96,10 @@ public class OpportunityRepository implements IOpportunityRepository {
             .collect(Collectors.toList());
     }
 
-    /*     
-     * Finds all InternshipOpportunities with a specific status.
+    /**
+     * Finds opportunities by status.
+     * @param status status value
+     * @return list of matching opportunities
      */
     @Override
     public List<InternshipOpportunity> findByStatus(OpportunityStatus status) {
@@ -94,8 +108,9 @@ public class OpportunityRepository implements IOpportunityRepository {
             .collect(Collectors.toList());
     }
 
-    /*     
-     * Deletes an InternshipOpportunity by its ID.
+    /**
+     * Deletes opportunity by id.
+     * @param opportunityID id of opportunity
      */
     @Override
     public void delete(String opportunityID) {

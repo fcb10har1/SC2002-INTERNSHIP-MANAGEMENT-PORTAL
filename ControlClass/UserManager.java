@@ -9,23 +9,33 @@ import EntityClass.CareerStaff;
 import RepositoryClass.IUserRepository;
 import RepositoryClass.UserRepository;
 
-/*
- * Manages user-related operations such as password changes and CompanyRep approvals
+/**
+ * Manages user-related operations such as password changes and CompanyRep approval/rejection tracking.
  */
 public class UserManager {
 
     private final IUserRepository userRepository;
 
+    /**
+     * Constructs a UserManager with the given repository.
+     * @param userRepository user repository
+     */
     public UserManager(IUserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Constructs a UserManager with a new default UserRepository instance.
+     */
     public UserManager() {
         this(new UserRepository());
     }
 
-    /*
-     * Changes the password for a user identified by userId
+    /**
+     * Changes the password of the user identified by the supplied ID.
+     * @param userId user ID
+     * @param newPwd new password value
+     * @return true if password changed, false if user not found
      */
     public boolean changePassword(String userId, String newPwd) {
         Optional<User> opt = userRepository.findById(userId);
@@ -40,8 +50,10 @@ public class UserManager {
         return true;
     }
     
-    /*
-     * Changes the password for a student
+    /**
+     * Changes the password for a student entity.
+     * @param s student whose password will change
+     * @param newPwd new password value
      */
     public void changeStudentPassword(Student s, String newPwd) {
         s.changePassword(newPwd);
@@ -49,8 +61,11 @@ public class UserManager {
         System.out.println("Password changed for student " + s.getUserId());
     }
 
-    /*
-     * Approves a CompanyRep by a CareerStaff member
+    /**
+     * Marks a company representative as approved.
+     * @param approver career staff performing approval
+     * @param rep company representative
+     * @return true if approved, false otherwise
      */
     public boolean approveCompanyRep(CareerStaff approver, CompanyRep rep) {
         if (approver == null || rep == null) {
@@ -70,8 +85,11 @@ public class UserManager {
         return true;
     }
 
-    /*
-     * Rejects a CompanyRep by a CareerStaff member
+    /**
+     * Marks a company representative as rejected.
+     * @param approver career staff performing rejection
+     * @param rep company representative
+     * @return true if rejected, false otherwise
      */
     public boolean rejectCompanyRep(CareerStaff approver, CompanyRep rep) {
         if (approver == null || rep == null) {
@@ -88,8 +106,9 @@ public class UserManager {
         return true;
     }
 
-    /*
-     * Returns the user repository
+    /**
+     * Returns the backing user repository.
+     * @return user repository
      */
     public IUserRepository getUserRepository() {
         return userRepository;

@@ -19,6 +19,7 @@ public class FilterSettings {
 
     /**
      * Returns the status filter.
+     * @return status value or null if unset
      */
     public OpportunityStatus getStatus() {
         return status;
@@ -26,20 +27,23 @@ public class FilterSettings {
 
     /**
      * Sets the status filter.
+     * @param status opportunity status to match (null clears)
      */
     public void setStatus(OpportunityStatus status) {
         this.status = status;
     }
 
     /**
-     * Returns the preferred major filter.
+     * Returns the preferred major substring filter.
+     * @return preferred major substring or null
      */
     public String getPreferredMajor() {
         return preferredMajor;
     }
 
     /**
-     * Sets the preferred major filter.
+     * Sets the preferred major substring filter.
+     * @param preferredMajor major substring (case-insensitive) or null
      */
     public void setPreferredMajor(String preferredMajor) {
         this.preferredMajor = preferredMajor;
@@ -47,6 +51,7 @@ public class FilterSettings {
 
     /**
      * Returns the internship level filter.
+     * @return internship level or null
      */
     public InternshipLevel getLevel() {
         return level;
@@ -54,41 +59,47 @@ public class FilterSettings {
 
     /**
      * Sets the internship level filter.
+     * @param level level to match (null clears)
      */
     public void setLevel(InternshipLevel level) {
         this.level = level;
     }
 
     /**
-     * Returns the order by filter.
+     * Returns the order by directive (e.g. TITLE_ASC).
+     * @return orderBy directive string
      */
     public String getOrderBy() {
         return orderBy;
     }
 
     /**
-     * Sets the order by filter.
+     * Sets the order by directive.
+     * @param orderBy directive (TITLE/COMPANY/LEVEL/CLOSEDATE + _ASC/_DESC)
      */
     public void setOrderBy(String orderBy) {
         this.orderBy = orderBy;
     }
 
     /**
-     * Returns the closing before date filter.
+     * Returns the closing-before date filter.
+     * @return date or null if unset
      */
     public LocalDate getClosingBefore() {
         return closingBefore;
     }
 
     /**
-     * Sets the closing before date filter.
+     * Sets the closing-before date filter.
+     * @param closingBefore date before which closing date must fall (null clears)
      */
     public void setClosingBefore(LocalDate closingBefore) {
         this.closingBefore = closingBefore;
     }
 
-    /**  
+    /**
      * Returns a string representation of the filter settings.
+     * @return summary string
      */
     @Override
     public String toString() {
@@ -102,7 +113,9 @@ public class FilterSettings {
     }
     
     /**
-     * Apply all filters and sorting to a list of opportunities.
+     * Applies all active filters and sorting to the provided list of opportunities.
+     * @param opportunities source list
+     * @return filtered and sorted list
      */
     public List<InternshipOpportunity> apply(List<InternshipOpportunity> opportunities) {
         return opportunities.stream()
@@ -116,9 +129,10 @@ public class FilterSettings {
             .collect(java.util.stream.Collectors.toList());
     }
     
-    /*
+    /**
      * Creates a comparator based on orderBy field (TITLE/COMPANY/LEVEL/CLOSEDATE with ASC/DESC).
      * Defaults to TITLE_ASC if orderBy is null or invalid.
+     * @return comparator for sorting opportunities
      */
     private java.util.Comparator<InternshipOpportunity> getComparator() {
         if (orderBy == null) orderBy = "TITLE_ASC";
@@ -147,7 +161,7 @@ public class FilterSettings {
     }
     
     /**
-     * Clears all filter settings.
+     * Clears all filter settings, restoring defaults.
      */
     public void clearAll() {
         status = null;
@@ -158,7 +172,8 @@ public class FilterSettings {
     }
     
     /**
-     * Checks if any filters are active.
+     * Checks if any filters other than default sorting are active.
+     * @return true if at least one filter value set
      */
     public boolean hasActiveFilters() {
         return status != null || 
@@ -169,6 +184,7 @@ public class FilterSettings {
     
     /**
      * Returns a user-friendly summary of active filters.
+     * @return summary of active filters and sort
      */
     public String getSummary() {
         if (!hasActiveFilters()) {

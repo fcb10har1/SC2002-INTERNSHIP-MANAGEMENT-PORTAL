@@ -7,7 +7,11 @@ public class CareerStaff extends User {
     private String department;
 
     /**
-     * Creates a new career staff member with the given details.
+     * Creates a new career staff member.
+     * @param userID unique id
+     * @param name staff name
+     * @param email email
+     * @param department department name
      */
     public CareerStaff(String userID, String name, String email, String department) {
         super(userID, name, email);
@@ -15,7 +19,8 @@ public class CareerStaff extends User {
     }
 
     /**
-     * Returns the department of this career staff member.
+     * Returns department.
+     * @return department string
      */
     
     public String getDepartment() {
@@ -23,7 +28,8 @@ public class CareerStaff extends User {
     }
 
     /**
-     * Sets the department of this career staff member.
+     * Sets department.
+     * @param department department name
      */
 
     public void setDepartment(String department) {

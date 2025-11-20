@@ -10,22 +10,29 @@ import EntityClass.Enums.OpportunityStatus;
 import RepositoryClass.IApplicationRepository;
 import RepositoryClass.IOpportunityRepository;
 
-/*
- * Generates reports on internship opportunities based on various filters
+/**
+ * Generates analytical and filtered reports about internship opportunities and related applications.
  */
 public class ReportManager {
 
     private final IOpportunityRepository opportunityRepository;
     private final IApplicationRepository applicationRepository;
 
+    /**
+     * Constructs a ReportManager with required repositories.
+     * @param oppRepo opportunity repository
+     * @param appRepo application repository
+     */
     public ReportManager(IOpportunityRepository oppRepo,
                          IApplicationRepository appRepo) {
         this.opportunityRepository = oppRepo;
         this.applicationRepository = appRepo;
     }
 
-    /*
-     * Generates a report based on the provided filter criteria
+    /**
+     * Generates a simple filtered list report of internship opportunities.
+     * @param filters key-value filter map (status, major, level, company)
+     * @return textual report content
      */
     public String generateReport(Map<String, String> filters) {
         List<InternshipOpportunity> opportunities = opportunityRepository.all();
@@ -55,8 +62,10 @@ public class ReportManager {
         return sb.toString();
     }
     
-    /*
-     * Filters internship opportunities by their status
+    /**
+     * Filters internship opportunities by status.
+     * @param status desired status
+     * @return list of matching opportunities
      */
     public List<InternshipOpportunity> filterByStatus(OpportunityStatus status) {
         return opportunityRepository.all().stream()
@@ -64,8 +73,10 @@ public class ReportManager {
                 .collect(Collectors.toList());
     }
 
-    /*
-     * Filters internship opportunities by preferred major
+    /**
+     * Filters internship opportunities by preferred major (case-insensitive exact match).
+     * @param major preferred major
+     * @return list of matching opportunities
      */
     public List<InternshipOpportunity> filterByMajor(String major) {
         return opportunityRepository.all().stream()
@@ -73,8 +84,10 @@ public class ReportManager {
                 .collect(Collectors.toList());
     }
 
-    /*
-     * Filters internship opportunities by level
+    /**
+     * Filters internship opportunities by level.
+     * @param level internship level
+     * @return list of matching opportunities
      */
     public List<InternshipOpportunity> filterByLevel(InternshipLevel level) {
         return opportunityRepository.all().stream()
@@ -82,8 +95,10 @@ public class ReportManager {
                 .collect(Collectors.toList());
     }
 
-    /*
-     * Filters internship opportunities by company name
+    /**
+     * Filters internship opportunities by company name (case-insensitive exact match).
+     * @param companyName company name
+     * @return list of matching opportunities
      */
     public List<InternshipOpportunity> filterByCompany(String companyName) {
         return opportunityRepository.all().stream()
@@ -91,8 +106,9 @@ public class ReportManager {
                 .collect(Collectors.toList());
     }
 
-    /*
-     * Generates a comprehensive report of all internship opportunities
+    /**
+     * Generates a comprehensive aggregate report for all opportunities and related applications.
+     * @return multi-section textual report
      */
     public String generateComprehensiveReport() {
     List<InternshipOpportunity> allOpps = opportunityRepository.all();
@@ -166,8 +182,10 @@ public class ReportManager {
     return sb.toString();
     }
 
-    /*
-     * Generates a filtered composite report with aggregates limited to the filtered subset
+    /**
+     * Generates an aggregate + detailed report restricted to the filtered subset.
+     * @param filters key-value filters (status, major, company, title, level, placement, appStatus)
+     * @return textual filtered report
      */
     public String generateFilteredCompositeReport(Map<String,String> filters) {
         List<InternshipOpportunity> base = opportunityRepository.all();
