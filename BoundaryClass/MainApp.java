@@ -2,6 +2,7 @@ package BoundaryClass;
 
 import ControlClass.ApplicationManager;
 import ControlClass.AuthService;
+import ControlClass.CSVImporter;
 import ControlClass.OpportunityManager;
 import ControlClass.ReportManager;
 import ControlClass.UserManager;
@@ -62,27 +63,59 @@ public class MainApp {
 
         // menus
         studentMenu = new StudentCliMenu(scanner, applicationManager, opportunityManager, withdrawalManager);
-        companyRepMenu = new CompanyRepCliMenu(scanner, applicationManager, opportunityManager, reportManager);
+    companyRepMenu = new CompanyRepCliMenu(scanner, applicationManager, opportunityManager);
         careerStaffMenu = new CareerStaffCliMenu(scanner, opportunityManager, withdrawalManager, reportManager, userManager);
 
-        // seed demo users for testing
+        // Import users from CSV files
+        importUsersFromCSV();
+        
+        // seed additional demo users for testing (if CSV import fails or for testing)
         seedDemoUsers();
     }
 
+    private void importUsersFromCSV() {
+        System.out.println("=== Importing Users from CSV Files ===");
+        
+        // Import students
+        int studentCount = CSVImporter.importStudents("students.csv", userRepository);
+        System.out.println("✓ Imported " + studentCount + " students from students.csv");
+        
+        // Import career staff
+        int staffCount = CSVImporter.importCareerStaff("careerstaff.csv", userRepository);
+        System.out.println("✓ Imported " + staffCount + " career staff from careerstaff.csv");
+        
+        // Import company representatives
+        int repCount = CSVImporter.importCompanyReps("companyreps.csv", userRepository);
+        System.out.println("✓ Imported " + repCount + " company representatives from companyreps.csv");
+        
+        System.out.println();
+    }
+
     private void seedDemoUsers() {
-        // Create demo users - all with default password "password"
-        Student student = new Student("s001", "Alice Student", 2, "Computer Science");
-        CompanyRep companyRep = new CompanyRep("c001", "Bob CompanyRep", "TechCorp", "Engineering", "HR Manager");
-        CareerStaff careerStaff = new CareerStaff("cs001", "Carol Staff", "Career Services");
-
-        userRepository.add(student);
-        userRepository.add(companyRep);
-        userRepository.add(careerStaff);
-
-        System.out.println("Demo users created:");
-        System.out.println("  Student:     ID=s001,  password=password");
-        System.out.println("  CompanyRep:  ID=c001,  password=password");
-        System.out.println("  CareerStaff: ID=cs001, password=password");
+        // Create demo users with email - all with default password "password"
+        // Only add if they don't already exist (to avoid duplicates from CSV)
+        
+        // Student ID format: U followed by 7 digits and ends with a letter (e.g., U2345123F)
+        if (!userRepository.findById("U9999999Z").isPresent()) {
+            Student student = new Student("U9999999Z", "Alice Demo Student", "alice.demo@e.ntu.edu.sg", 2, "Computer Science");
+            userRepository.add(student);
+            System.out.println("Demo student created: ID=U9999999Z, password=password");
+        }
+        
+        // Company Representative ID is their company email address
+        if (!userRepository.findById("demo.rep@techcorp.com").isPresent()) {
+            CompanyRep companyRep = new CompanyRep("demo.rep@techcorp.com", "Bob Demo CompanyRep", "demo.rep@techcorp.com", "TechCorp", "Engineering", "HR Manager");
+            userRepository.add(companyRep);
+            System.out.println("Demo CompanyRep created: ID=demo.rep@techcorp.com, password=password");
+        }
+        
+        // Career Center Staff's ID is their NTU account
+        if (!userRepository.findById("demo001").isPresent()) {
+            CareerStaff careerStaff = new CareerStaff("demo001", "Carol Demo Staff", "demo001@ntu.edu.sg", "Career Services");
+            userRepository.add(careerStaff);
+            System.out.println("Demo CareerStaff created: ID=demo001, password=password");
+        }
+        
         System.out.println();
     }
 

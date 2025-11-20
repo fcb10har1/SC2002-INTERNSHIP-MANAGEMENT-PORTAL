@@ -10,8 +10,8 @@ public class CompanyRep extends User {
     private List<InternshipOpportunity> opportunities;
     
     // shd opportunities be here in constructor?
-    public CompanyRep(String userID, String name, String companyName, String department, String position) {
-        super(userID, name);
+    public CompanyRep(String userID, String name, String email, String companyName, String department, String position) {
+        super(userID, name, email);
         this.companyName = companyName;
         this.department = department;
         this.position = position;

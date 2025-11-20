@@ -229,9 +229,14 @@ public class StudentCliMenu {
         System.out.print("Enter reason for withdrawal: ");
         String reason = scanner.nextLine();
         
-        // TODO: Use withdrawalManager to submit withdrawal request
-        System.out.println("Withdrawal request submitted (awaiting WithdrawalManager implementation).");
-        System.out.println("Application: " + selectedApp.getTarget().getTitle());
-        System.out.println("Reason: " + reason);
+        try {
+            withdrawalManager.requestWithdrawal(student, selectedApp, reason);
+            System.out.println("✓ Withdrawal request submitted successfully!");
+            System.out.println("Application: " + selectedApp.getTarget().getTitle());
+            System.out.println("Reason: " + reason);
+            System.out.println("Career staff will review your request.");
+        } catch (Exception e) {
+            System.out.println("Error submitting withdrawal request: " + e.getMessage());
+        }
     }
 }

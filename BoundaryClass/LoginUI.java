@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.Scanner;
 
 import ControlClass.AuthService;
+import ControlClass.CSVImporter;
 import ControlClass.UserManager;
 import EntityClass.User;
 import EntityClass.CompanyRep;
@@ -34,12 +35,12 @@ public class LoginUI {
                 return handleLogin();
             case "2":
                 handleCompanyRepRegistration();
-                return Optional.empty(); // Return to menu after registration
+                return promptLogin(); // Return to menu after registration instead of exiting
             case "0":
                 return Optional.empty(); // Exit
             default:
                 System.out.println("Invalid choice.");
-                return Optional.empty();
+                return promptLogin(); // Return to menu for invalid choices too
         }
     }
 
@@ -75,18 +76,28 @@ public class LoginUI {
 
     private void handleCompanyRepRegistration() {
         System.out.println("\n=== Company Representative Registration ===");
+        System.out.println("Note: Your User ID must be your company email address.");
         
-        System.out.print("Enter desired user ID: ");
+        System.out.print("Enter your company email address (this will be your User ID): ");
         String userId = scanner.nextLine().trim();
+        
+        // Validate email format
+        if (!userId.contains("@") || !userId.contains(".")) {
+            System.out.println("Error: Invalid email address format.");
+            return;
+        }
         
         // Check if ID already exists
         if (authService.getUserRepository().findById(userId).isPresent()) {
-            System.out.println("Error: User ID already exists. Please choose a different ID.");
+            System.out.println("Error: This email is already registered. Please use a different email.");
             return;
         }
         
         System.out.print("Enter your name: ");
         String name = scanner.nextLine().trim();
+        
+        // Email will be the same as userId for company reps
+        String email = userId;
         
         System.out.print("Enter company name: ");
         String companyName = scanner.nextLine().trim();
@@ -101,15 +112,22 @@ public class LoginUI {
         String password = scanner.nextLine().trim();
         
         // Create new CompanyRep (not approved yet)
-        CompanyRep newRep = new CompanyRep(userId, name, companyName, department, position);
+        CompanyRep newRep = new CompanyRep(userId, name, email, companyName, department, position);
         newRep.changePassword(password); // Set custom password
         
         // Add to repository
         authService.getUserRepository().add(newRep);
         
+        // Export to CSV file to persist registration
+        boolean exported = CSVImporter.exportCompanyRep("companyreps.csv", newRep);
+        
         System.out.println("\nRegistration successful!");
         System.out.println("Your account is pending approval by Career Center Staff.");
         System.out.println("You will be able to log in once approved.");
         System.out.println("User ID: " + userId);
+        
+        if (!exported) {
+            System.out.println("Note: Registration saved to session but may not persist after restart.");
+        }
     }
 }
