@@ -1,11 +1,12 @@
 package BoundaryClass;
 
+import EntityClass.User;
 import ControlClass.ApplicationManager;
 import ControlClass.OpportunityManager;
 import ControlClass.ReportManager;
 import ControlClass.UserManager;
 import ControlClass.WithdrawalManager;
-import EntityClass.User;
+import BoundaryClass.LoginUI;
 
 import java.util.Optional;
 import java.util.Scanner;

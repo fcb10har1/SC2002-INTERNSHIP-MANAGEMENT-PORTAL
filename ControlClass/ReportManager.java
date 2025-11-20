@@ -1,13 +1,14 @@
 package ControlClass;
 
-import EntityClass.Application;
-import EntityClass.InternshipOpportunity;
-import EntityClass.InternshipLevel;
-import EntityClass.OpportunityStatus;
-
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import RepositoryClass.ApplicationRepository;
+import RepositoryClass.OpportunityRepository;
+import EntityClass.Application;
+import EntityClass.Enums.InternshipLevel;
+import EntityClass.InternshipOpportunity;
+import EntityClass.Enums.OpportunityStatus;
 
 // generating reports for career staff
 public class ReportManager {
