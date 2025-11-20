@@ -8,16 +8,10 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+/*
+ * Handles importing and exporting of data in CSV format
+ */
 public class CSVImporter {
-
-    /**
-     * Import students from CSV file
-     * CSV format: StudentID,Name,Major,Year,Email
-     * 
-     * @param filePath Path to the students CSV file
-     * @param userRepo User repository to add students to
-     * @return Number of students imported
-     */
     public static int importStudents(String filePath, IUserRepository userRepo) {
         int count = 0;
         
@@ -45,8 +39,7 @@ public class CSVImporter {
                         continue;
                     }
                     
-                    // CSV format: StudentID,Name,Major,Year,Email
-                    String studentId = fields[0].trim();  // e.g., U2310001A
+                    String studentId = fields[0].trim();  
                     String name = fields[1].trim();
                     String major = fields[2].trim();
                     int yearOfStudy = Integer.parseInt(fields[3].trim());
@@ -74,10 +67,6 @@ public class CSVImporter {
     /**
      * Import career staff from CSV file
      * CSV format: StaffID,Name,Role,Department,Email
-     * 
-     * @param filePath Path to the career staff CSV file
-     * @param userRepo User repository to add career staff to
-     * @return Number of career staff imported
      */
     public static int importCareerStaff(String filePath, IUserRepository userRepo) {
         int count = 0;
@@ -106,10 +95,9 @@ public class CSVImporter {
                         continue;
                     }
                     
-                    // CSV format: StaffID,Name,Role,Department,Email
-                    String staffId = fields[0].trim();  // NTU account e.g., sng001
+                
+                    String staffId = fields[0].trim(); 
                     String name = fields[1].trim();
-                    // fields[2] is Role - not used in CareerStaff constructor
                     String department = fields[3].trim();
                     String email = fields[4].trim();
                     
@@ -132,18 +120,12 @@ public class CSVImporter {
 
     /**
      * Export a CompanyRep to CSV file (append mode)
-     * CSV format: CompanyRepID,Name,Email,CompanyName,Department,Position
-     * 
-     * @param filePath Path to the company reps CSV file
-     * @param companyRep CompanyRep to export
-     * @return true if successful, false otherwise
      */
     public static boolean exportCompanyRep(String filePath, EntityClass.CompanyRep companyRep) {
         try (java.io.FileWriter fw = new java.io.FileWriter(filePath, true);
              java.io.BufferedWriter bw = new java.io.BufferedWriter(fw);
              java.io.PrintWriter out = new java.io.PrintWriter(bw)) {
             
-            // Create CSV line: CompanyRepID,Name,Email,CompanyName,Department,Position
             String line = String.format("%s,%s,%s,%s,%s,%s",
                 companyRep.getUserId(),
                 companyRep.getName(),
@@ -165,10 +147,6 @@ public class CSVImporter {
     /**
      * Import company representatives from CSV file
      * CSV format: CompanyRepID,Name,Email,CompanyName,Department,Position
-     * 
-     * @param filePath Path to the company reps CSV file
-     * @param userRepo User repository to add company reps to
-     * @return Number of company reps imported
      */
     public static int importCompanyReps(String filePath, IUserRepository userRepo) {
         int count = 0;
@@ -197,8 +175,8 @@ public class CSVImporter {
                         continue;
                     }
                     
-                    // CSV format: CompanyRepID,Name,Email,CompanyName,Department,Position
-                    String repId = fields[0].trim();  // Company email
+                    
+                    String repId = fields[0].trim();
                     String name = fields[1].trim();
                     String email = fields[2].trim();
                     String companyName = fields[3].trim();
@@ -215,9 +193,8 @@ public class CSVImporter {
             }
             
         } catch (IOException e) {
-            // File might not exist yet, which is okay for first run
             if (e.getMessage().contains("No such file")) {
-                return 0; // No error message, just return 0
+                return 0;
             }
             System.err.println("Error reading company reps CSV file: " + e.getMessage());
             return 0;
