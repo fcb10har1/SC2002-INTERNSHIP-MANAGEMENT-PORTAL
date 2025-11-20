@@ -9,6 +9,9 @@ import ControlClass.UserManager;
 import EntityClass.User;
 import EntityClass.CompanyRep;
 
+/**
+ * LoginUI handles user login and registration interactions via CLI.
+ */
 public class LoginUI {
 
     private final AuthService authService;
@@ -20,7 +23,11 @@ public class LoginUI {
         this.userManager = userManager;
         this.scanner = scanner;
     }
-
+    
+    /**
+     * Displays the login and registration menu and handles user input.
+     * @return an Optional containing the logged-in User, or empty if exiting.
+     */
     public Optional<User> promptLogin() {
         System.out.println("\n=== Login / Registration Menu ===");
         System.out.println("1. Login");
@@ -44,6 +51,9 @@ public class LoginUI {
         }
     }
 
+    /*     
+     * Handles user login process.
+     */
     private Optional<User> handleLogin() {
         System.out.print("Enter user ID: ");
         String userId = scanner.nextLine().trim();
@@ -81,6 +91,9 @@ public class LoginUI {
         return Optional.of(user);
     }
 
+    /*
+     * Handles registration process for Company Representatives.
+     */
     private void handleCompanyRepRegistration() {
         System.out.println("\n=== Company Representative Registration ===");
         System.out.println("Note: Your User ID must be your company email address.");

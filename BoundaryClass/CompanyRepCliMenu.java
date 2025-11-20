@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
+/*
+ * CLI menu for Company Representative users to manage internship opportunities.
+ */
 public class CompanyRepCliMenu {
 
     private final Scanner scanner;
@@ -28,6 +31,9 @@ public class CompanyRepCliMenu {
         this.opportunityManager = oppMgr;
     }
 
+    /*
+     * Displays the Company Representative menu and handles user input.
+     */
     public void showOptions(CompanyRep rep) {
         int choice;
         do {
@@ -83,6 +89,9 @@ public class CompanyRepCliMenu {
         } while (choice != 0);
     }
 
+    /*
+     * Create a new internship opportunity.
+     */
     private void createOpportunity(CompanyRep rep) {
         // Check if rep has reached max opportunities (5)
         List<InternshipOpportunity> myOpps = opportunityManager.listOwnedOpps(rep);
@@ -173,7 +182,10 @@ public class CompanyRepCliMenu {
         System.out.println("Opportunity ID: " + oppId);
         System.out.println("Status: Pending (awaiting Career Staff approval)");
     }
-
+    
+    /*
+     * List all internship opportunities owned by the company representative.
+     */
     private void listMyOpportunities(CompanyRep rep) {
         List<InternshipOpportunity> myOpps = opportunityManager.listOwnedOpps(rep);
         
@@ -195,6 +207,9 @@ public class CompanyRepCliMenu {
         }
     }
 
+    /*
+     * Edit an existing internship opportunity.
+     */
     private void editOpportunity(CompanyRep rep) {
         List<InternshipOpportunity> myOpps = opportunityManager.listOwnedOpps(rep);
         
@@ -321,6 +336,9 @@ public class CompanyRepCliMenu {
         System.out.println("✓ Opportunity updated successfully!");
     }
 
+    /*
+     * Toggle visibility of an internship opportunity.
+     */
     private void toggleVisibility(CompanyRep rep) {
         List<InternshipOpportunity> myOpps = opportunityManager.listOwnedOpps(rep);
         
@@ -357,6 +375,9 @@ public class CompanyRepCliMenu {
         System.out.println("✓ Visibility toggled! Now: " + (opp.getVisible() ? "ON" : "OFF"));
     }
 
+    /*
+     * Review applications for a selected internship opportunity.
+     */
     private void reviewApplications(CompanyRep rep) {
         // First, list the company rep's opportunities
         List<InternshipOpportunity> myOpps = opportunityManager.listOwnedOpps(rep);
@@ -455,6 +476,9 @@ public class CompanyRepCliMenu {
         }
     }
 
+    /*
+     * Delete an internship opportunity.
+     */
     private void deleteOpportunity(CompanyRep rep) {
         List<InternshipOpportunity> myOpps = opportunityManager.listOwnedOpps(rep);
         
@@ -498,6 +522,9 @@ public class CompanyRepCliMenu {
         }
     }
 
+    /*
+     * Change password for the Company Representative user.
+     */
     private boolean changePassword(CompanyRep rep) {
         System.out.println("\n=== Change Password ===");
         System.out.print("Enter current password: ");
@@ -528,7 +555,5 @@ public class CompanyRepCliMenu {
         rep.changePassword(newPassword);
         return true;
     }
-
-    // Report generation removed from CompanyRep interface (restricted to CareerStaff)
 }
 
