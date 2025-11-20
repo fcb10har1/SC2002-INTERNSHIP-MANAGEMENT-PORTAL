@@ -1,5 +1,6 @@
 package BoundaryClass;
 
+import EntityClass.User;
 import ControlClass.ApplicationManager;
 import ControlClass.OpportunityManager;
 import ControlClass.ReportManager;
@@ -7,7 +8,6 @@ import ControlClass.UserManager;
 import ControlClass.WithdrawalManager;
 import ControlClass.AuthService;
 
-import EntityClass.User;
 import EntityClass.Student;
 import EntityClass.CompanyRep;
 import EntityClass.CareerStaff;
