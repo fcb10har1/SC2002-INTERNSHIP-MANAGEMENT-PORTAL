@@ -10,7 +10,9 @@ import EntityClass.Enums.OpportunityStatus;
 import RepositoryClass.IApplicationRepository;
 import RepositoryClass.IOpportunityRepository;
 
-// generating reports for career staff
+/*
+ * Generates reports on internship opportunities based on various filters
+ */
 public class ReportManager {
 
     private final IOpportunityRepository opportunityRepository;
@@ -49,32 +51,46 @@ public class ReportManager {
         }
         return sb.toString();
     }
-
+    
+    /*
+     * Filters internship opportunities by their status
+     */
     public List<InternshipOpportunity> filterByStatus(OpportunityStatus status) {
         return opportunityRepository.all().stream()
                 .filter(o -> o.getStatus() == status)
                 .collect(Collectors.toList());
     }
 
+    /*
+     * Filters internship opportunities by preferred major
+     */
     public List<InternshipOpportunity> filterByMajor(String major) {
         return opportunityRepository.all().stream()
                 .filter(o -> major.equalsIgnoreCase(o.getPreferredMajor()))
                 .collect(Collectors.toList());
     }
 
+    /*
+     * Filters internship opportunities by level
+     */
     public List<InternshipOpportunity> filterByLevel(InternshipLevel level) {
         return opportunityRepository.all().stream()
                 .filter(o -> o.getLevel() == level)
                 .collect(Collectors.toList());
     }
 
+    /*
+     * Filters internship opportunities by company name
+     */
     public List<InternshipOpportunity> filterByCompany(String companyName) {
         return opportunityRepository.all().stream()
                 .filter(o -> companyName.equalsIgnoreCase(o.getCompanyName()))
                 .collect(Collectors.toList());
     }
 
-    // Comprehensive aggregated report for career staff
+    /*
+     * Generates a comprehensive report of all internship opportunities
+     */
     public String generateComprehensiveReport() {
     List<InternshipOpportunity> allOpps = opportunityRepository.all();
     List<Application> allApps = applicationRepository.all();

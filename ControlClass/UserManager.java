@@ -9,6 +9,9 @@ import EntityClass.CareerStaff;
 import RepositoryClass.IUserRepository;
 import RepositoryClass.UserRepository;
 
+/*
+ * Manages user-related operations such as password changes and CompanyRep approvals
+ */
 public class UserManager {
 
     private final IUserRepository userRepository;
@@ -21,6 +24,9 @@ public class UserManager {
         this(new UserRepository());
     }
 
+    /*
+     * Changes the password for a user identified by userId
+     */
     public boolean changePassword(String userId, String newPwd) {
         Optional<User> opt = userRepository.findById(userId);
         if (!opt.isPresent()) {
@@ -33,13 +39,19 @@ public class UserManager {
         System.out.println("Password changed for user " + userId);
         return true;
     }
-
+    
+    /*
+     * Changes the password for a student
+     */
     public void changeStudentPassword(Student s, String newPwd) {
         s.changePassword(newPwd);
         userRepository.update(s);
         System.out.println("Password changed for student " + s.getUserId());
     }
 
+    /*
+     * Approves a CompanyRep by a CareerStaff member
+     */
     public boolean approveCompanyRep(CareerStaff approver, CompanyRep rep) {
         if (approver == null || rep == null) {
             return false;
@@ -58,6 +70,9 @@ public class UserManager {
         return true;
     }
 
+    /*
+     * Rejects a CompanyRep by a CareerStaff member
+     */
     public boolean rejectCompanyRep(CareerStaff approver, CompanyRep rep) {
         if (approver == null || rep == null) {
             return false;
@@ -73,6 +88,9 @@ public class UserManager {
         return true;
     }
 
+    /*
+     * Returns the user repository
+     */
     public IUserRepository getUserRepository() {
         return userRepository;
     }
