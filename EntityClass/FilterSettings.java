@@ -1,7 +1,8 @@
 package EntityClass;
 
 import java.time.LocalDate;
-
+import EntityClass.Enums.OpportunityStatus;
+import EntityClass.Enums.InternshipLevel;
 // every user's saved filter settings for viewing internships
 
 public class FilterSettings {
