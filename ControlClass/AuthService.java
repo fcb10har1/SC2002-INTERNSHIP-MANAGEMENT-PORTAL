@@ -9,23 +9,38 @@ import EntityClass.CareerStaff;
 import RepositoryClass.IUserRepository;
 import RepositoryClass.UserRepository;
 
+/*
+ * Manages authentication and authorization of users
+ */
 public class AuthService {
 
     private final IUserRepository userRepository;
 
+    /*
+     * Constructor
+     */
     public AuthService(IUserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
+    /*
+     * Logs in a user with given credentials
+     */
     public Optional<User> login(String userId, String password) {
         return userRepository.findById(userId)
                 .filter(u -> u.login(userId, password));
     }
 
+    /*
+     * Logs out the given user
+     */
     public void logout(User user) {
         user.logout();
     }
 
+    /*
+     * Verifies if the user has the specified role
+     */
     public boolean verifyRole(User user, String role) {
         switch (role) {
             case "Student":
@@ -39,6 +54,9 @@ public class AuthService {
         }
     }
 
+    /*
+     * Checks if a CompanyRep is approved
+     */
     public boolean isApprovedCompanyRep(CompanyRep rep) {
         if (userRepository instanceof UserRepository) {
             UserRepository concrete = (UserRepository) userRepository;
@@ -47,6 +65,9 @@ public class AuthService {
         return false;
     }
 
+    /*
+     * Returns the user repository
+     */
     public IUserRepository getUserRepository() {
         return userRepository;
     }

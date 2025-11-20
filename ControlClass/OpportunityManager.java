@@ -10,6 +10,9 @@ import RepositoryClass.IOpportunityRepository;
 
 import java.util.List;
 
+/*
+ * Manages internship opportunities between CompanyReps, CareerStaff, and Students
+ */
 public class OpportunityManager {
 
     private final IOpportunityRepository opportunityRepository;
@@ -18,7 +21,9 @@ public class OpportunityManager {
         this.opportunityRepository = opportunityRepository;
     }
 
-    // CompanyRep actions
+    /*
+    * CompanyRep creates a draft internship opportunity
+    */
     public InternshipOpportunity createDraft(CompanyRep owner, String company, int slots) {
         InternshipOpportunity opportunity =
                 new InternshipOpportunity(/*id*/ "", "", "", null,
@@ -29,6 +34,9 @@ public class OpportunityManager {
         return opportunity;
     }
 
+    /*
+     * CompanyRep submits a draft internship opportunity for approval
+     */
     public void submitForApproval(InternshipOpportunity opportunity) {
         if (opportunity.getStatus() != OpportunityStatus.Draft) {
             throw new IllegalStateException("Only Draft opportunities can be submitted.");
@@ -38,6 +46,9 @@ public class OpportunityManager {
         opportunityRepository.update(opportunity);
     }
 
+    /*
+     * CompanyRep toggles visibility of an approved internship opportunity
+     */
     public void toggleVisibility(InternshipOpportunity opportunity) {
         if (opportunity.getStatus() != OpportunityStatus.Approved) {
             throw new IllegalStateException("Only approved opportunities can toggle visibility.");
@@ -46,7 +57,9 @@ public class OpportunityManager {
         opportunityRepository.update(opportunity);
     }
 
-    // CareerStaff actions
+    /*
+     * CareerStaff approves a pending internship opportunity
+     */
     public void approve(CareerStaff staff, InternshipOpportunity io) {
         if (io.getStatus() != OpportunityStatus.Pending) {
             throw new IllegalStateException("Only Pending opportunities can be approved.");
@@ -56,6 +69,9 @@ public class OpportunityManager {
         opportunityRepository.update(io);
     }
 
+    /*
+     * CareerStaff rejects a pending internship opportunity
+     */
     public void reject(CareerStaff staff, InternshipOpportunity io) {
         if (io.getStatus() != OpportunityStatus.Pending) {
             throw new IllegalStateException("Only Pending opportunities can be rejected.");
@@ -65,7 +81,9 @@ public class OpportunityManager {
         opportunityRepository.update(io);
     }
 
-    // Listing
+    /*
+     * Lists internship opportunities visible to a student based on eligibility
+     */
     public List<InternshipOpportunity> listVisibleFor(Student student) {
         // Apply eligibility rules explicitly: status Approved & visible, major match, level-year mapping, slots available
         int year = student.getYearOfStudy();
@@ -89,16 +107,22 @@ public class OpportunityManager {
                 .filter(opp -> student.getApplications().stream().noneMatch(app -> app.getTarget().equals(opp)))
                 .collect(java.util.stream.Collectors.toList());
     }
-
+    /*
+     * Lists internship opportunities owned by a CompanyRep
+     */
     public List<InternshipOpportunity> listOwnedOpps(CompanyRep rep) {
         return opportunityRepository.findByOwner(rep);
     }
-
+    /*
+     * Gets the opportunity repository
+     */
     public IOpportunityRepository getRepository() {
         return opportunityRepository;
     }
 
-    // Eligibility check – simplified
+    /*
+     * Checks if a student is eligible to apply for a given internship opportunity
+     */
     public boolean checkEligibility(InternshipOpportunity opportunity, Student student) {
         if (opportunity.getStatus() != OpportunityStatus.Approved || !opportunity.getVisible()) {
             return false;

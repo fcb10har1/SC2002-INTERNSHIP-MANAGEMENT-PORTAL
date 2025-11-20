@@ -6,6 +6,9 @@ import EntityClass.Enums.OpportunityStatus;
 import java.util.List;
 import java.util.Optional;
 
+/*
+ * IOpportunityRepository defines the contract for InternshipOpportunity data storage and retrieval.
+ */
 public interface IOpportunityRepository {
     void save(InternshipOpportunity opportunity);
     void add(InternshipOpportunity io);

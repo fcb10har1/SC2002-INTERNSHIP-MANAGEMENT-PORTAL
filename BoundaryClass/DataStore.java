@@ -7,21 +7,33 @@ import EntityClass.User;
 import java.io.*;
 import java.util.List;
 
-// handling persistent data 
+/**
+ * DataStore handles the serialization and deserialization of users,
+ * internship opportunities, and applications to and from files.
+ */
 public class DataStore {
 
     private static final String USERS_FILE = "users.ser";
     private static final String OPPS_FILE = "opportunities.ser";
     private static final String APPS_FILE = "applications.ser";
 
+    /*
+     * Writes the list of users to the users.ser file.
+     */
     public void writeUsers(List<User> users) throws IOException {
         writeObject(USERS_FILE, users);
     }
 
+    /*
+     * Writes the list of internship opportunities to the opportunities.ser file.
+     */
     public void writeOpportunities(List<InternshipOpportunity> opportunities) throws IOException {
         writeObject(OPPS_FILE, opportunities);
     }
 
+    /*
+     * Writes the list of applications to the applications.ser file.
+     */
     public void writeApplications(List<Application> applications) throws IOException {
         writeObject(APPS_FILE, applications);
     }
@@ -40,7 +52,10 @@ public class DataStore {
     public List<Application> readApplications() throws IOException, ClassNotFoundException {
         return (List<Application>) readObject(APPS_FILE);
     }
-
+    
+    /*
+     * Writes an object to a file using serialization.
+     */
     private void writeObject(String filename, Object obj) throws IOException {
         try (ObjectOutputStream oos =
                      new ObjectOutputStream(new FileOutputStream(filename))) {
@@ -48,6 +63,9 @@ public class DataStore {
         }
     }
 
+    /*
+     * Reads an object from a file using deserialization.
+     */
     private Object readObject(String filename) throws IOException, ClassNotFoundException {
         File f = new File(filename);
         if (!f.exists()) {

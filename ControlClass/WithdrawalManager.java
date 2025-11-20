@@ -15,7 +15,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-// for creation and approving//rejecting withdrawal requests
+/*
+ * Manages withdrawal requests including creation, approval, and rejection
+ */
 public class WithdrawalManager {
 
     private final List<WithdrawalRequest> requests = new ArrayList<>();
@@ -33,7 +35,9 @@ public class WithdrawalManager {
         this.applicationRepository = null;
     }
 
-    // student requests withdrawal
+    /* 
+     * Student requests withdrawal from an application
+     */
     public WithdrawalRequest requestWithdrawal(Student student, Application application, String reason) {
         // Prevent duplicate or redundant withdrawal if one is pending or already approved
         boolean blocked = requests.stream().anyMatch(r -> r.getApplication().equals(application) && (!r.isProcessed() || r.isApproved()));
@@ -48,7 +52,9 @@ public class WithdrawalManager {
         return request;
     }
 
-    // career staff approves!
+    /* 
+     * Approves a withdrawal request by a CareerStaff member
+     */
     public void approveWithdrawal(CareerStaff staff, String requestId) {
         WithdrawalRequest req = findByIdOrThrow(requestId);
         if (req.isProcessed()) {
@@ -73,7 +79,9 @@ public class WithdrawalManager {
         System.out.println("Withdrawal request " + requestId + " approved by " + staff.getUserId());
     }
 
-    // career staff rejects!
+    /* 
+     * Rejects a withdrawal request by a CareerStaff member
+     */
     public void rejectWithdrawal(CareerStaff staff, String requestId) {
         WithdrawalRequest req = findByIdOrThrow(requestId);
         if (req.isProcessed()) {
@@ -88,6 +96,9 @@ public class WithdrawalManager {
         return new ArrayList<>(requests);
     }
 
+    /*
+     * Finds a withdrawal request by its ID or throws an exception if not found
+     */
     private WithdrawalRequest findByIdOrThrow(String requestId) {
         Optional<WithdrawalRequest> opt = requests.stream()
                 .filter(r -> r.getRequestId().equals(requestId))

@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+/*
+ * CLI menu for Career Staff users to manage company representatives,
+ */
 public class CareerStaffCliMenu {
 
     private final Scanner scanner;
@@ -27,6 +30,9 @@ public class CareerStaffCliMenu {
     private final UserManager userManager;
     private FilterSettings filterSettings = new FilterSettings(); // Persists across menu navigation
 
+    /*
+     * Constructor for CareerStaffCliMenu.
+     */
     public CareerStaffCliMenu(Scanner scanner,
                               OpportunityManager oppMgr,
                               WithdrawalManager wdMgr,
@@ -39,6 +45,9 @@ public class CareerStaffCliMenu {
         this.userManager = userMgr;
     }
 
+    /*
+     * Displays the Career Staff menu and handles user input.
+     */
     public void showOptions(CareerStaff staff) {
         int choice;
         do {
@@ -85,6 +94,9 @@ public class CareerStaffCliMenu {
         } while (choice != 0);
     }
 
+    /*
+     * Approve or reject company representatives.
+     */
     private void approveRejectCompanyReps(CareerStaff staff) {
         IUserRepository userRepo = userManager.getUserRepository();
         
@@ -150,6 +162,9 @@ public class CareerStaffCliMenu {
         }
     }
 
+    /*
+     * Approve or reject internship opportunities.
+     */
     private void approveRejectOpportunities(CareerStaff staff) {
         // Filter options
         System.out.println("\n=== View All Opportunities (with filters) ===");
@@ -311,6 +326,9 @@ public class CareerStaffCliMenu {
         System.out.println("\n✓ Filters configured: " + filterSettings.getSummary());
     }
 
+    /*
+     * Generate comprehensive internship opportunities report.
+     */
     private void generateReports() {
         System.out.println("\n=== Generate & Filter Internship Report ===");
         System.out.println("Press Enter to skip a filter.");
@@ -361,6 +379,9 @@ public class CareerStaffCliMenu {
         }
     }
 
+    /*
+     * Approve or reject withdrawal requests.
+     */
     private void approveRejectWithdrawals(CareerStaff staff) {
         List<EntityClass.WithdrawalRequest> pending = withdrawalManager.getAllRequests().stream()
                 .filter(r -> !r.isProcessed())
@@ -395,6 +416,9 @@ public class CareerStaffCliMenu {
         }
     }
 
+    /*
+     * Change password for the Career Staff user.
+     */
     private boolean changePassword(CareerStaff staff) {
         System.out.println("\n=== Change Password ===");
         System.out.print("Enter current password: ");

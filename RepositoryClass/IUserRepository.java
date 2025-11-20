@@ -5,7 +5,9 @@ import java.util.Optional;
 
 import EntityClass.User;
 
-// DIP abstraction, managers and services depend on this
+/*
+ * IUserRepository defines the contract for User data storage and retrieval.
+ */
 public interface IUserRepository {
 
     void add(User u);
