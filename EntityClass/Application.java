@@ -68,5 +68,9 @@ public class Application {
     public void studentAccept() {
         this.acceptedByStudent = true;
     }
+    // Revoke acceptance (e.g., after approved withdrawal)
+    public void revokeStudentAcceptance() {
+        this.acceptedByStudent = false;
+    }
 
 }

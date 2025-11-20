@@ -5,6 +5,8 @@ import ControlClass.OpportunityManager;
 import EntityClass.CompanyRep;
 import EntityClass.InternshipOpportunity;
 import EntityClass.Application;
+import EntityClass.Student;
+import EntityClass.FilterSettings;
 import EntityClass.Enums.InternshipLevel;
 import EntityClass.Enums.OpportunityStatus;
 
@@ -22,6 +24,7 @@ public class CompanyRepCliMenu {
     private final Scanner scanner;
     private final ApplicationManager applicationManager;
     private final OpportunityManager opportunityManager;
+    private FilterSettings filterSettings = new FilterSettings(); // Persists across menu navigation
 
     public CompanyRepCliMenu(Scanner scanner,
                              ApplicationManager appMgr,
@@ -187,24 +190,99 @@ public class CompanyRepCliMenu {
      * List all internship opportunities owned by the company representative.
      */
     private void listMyOpportunities(CompanyRep rep) {
+        // Manage filters
+        System.out.println("\n=== Filter Options ===");
+        System.out.println("Current: " + filterSettings.getSummary());
+        System.out.println("1. View opportunities with current filters");
+        System.out.println("2. Modify filters");
+        System.out.println("3. Clear all filters");
+        System.out.println("0. Back");
+        System.out.print("Choice: ");
+        
+        String filterChoice = scanner.nextLine().trim();
+        
+        if ("0".equals(filterChoice)) {
+            return;
+        } else if ("2".equals(filterChoice)) {
+            configureFilters();
+        } else if ("3".equals(filterChoice)) {
+            filterSettings.clearAll();
+            System.out.println("✓ All filters cleared.");
+        }
+        
         List<InternshipOpportunity> myOpps = opportunityManager.listOwnedOpps(rep);
         
-        if (myOpps.isEmpty()) {
-            System.out.println("\nYou have no internship opportunities yet.");
+        // Apply filters
+        List<InternshipOpportunity> filteredOpps = filterSettings.apply(myOpps);
+        
+        if (filteredOpps.isEmpty()) {
+            System.out.println("\nNo opportunities match your current filters.");
             return;
         }
         
         System.out.println("\n=== My Internship Opportunities ===");
-        for (int i = 0; i < myOpps.size(); i++) {
-            InternshipOpportunity opp = myOpps.get(i);
+        System.out.println(filterSettings.getSummary());
+        for (int i = 0; i < filteredOpps.size(); i++) {
+            InternshipOpportunity opp = filteredOpps.get(i);
             System.out.printf("\n%d. %s (ID: %s)%n", i + 1, opp.getTitle(), opp.getOpportunityID());
             System.out.println("   Status: " + opp.getStatus());
+            if (opp.getOwner() != null) {
+                System.out.println("   Company Rep: " + opp.getOwner().getName() + " (" + opp.getOwner().getUserId() + ")");
+            }
             System.out.println("   Level: " + opp.getLevel());
             System.out.println("   Slots (remaining/total): " + opp.getSlots() + "/" + opp.getSlotCap());
             System.out.println("   Visible: " + (opp.getVisible() ? "Yes" : "No"));
             System.out.println("   Open: " + opp.getOpenDate() + " | Close: " + opp.getCloseDate());
             System.out.println("   Description: " + opp.getDescription());
         }
+    }
+    
+    private void configureFilters() {
+        System.out.println("\n=== Configure Filters ===");
+        
+        System.out.print("Filter by status (Pending/Approved/Rejected/Filled, or leave blank): ");
+        String statusStr = scanner.nextLine().trim();
+        if (!statusStr.isEmpty()) {
+            try {
+                filterSettings.setStatus(OpportunityStatus.valueOf(statusStr));
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid status, filter not applied.");
+            }
+        } else {
+            filterSettings.setStatus(null);
+        }
+        
+        System.out.print("Filter by major (substring, or leave blank): ");
+        String major = scanner.nextLine().trim();
+        filterSettings.setPreferredMajor(major.isEmpty() ? null : major);
+        
+        System.out.print("Filter by level (Basic/Intermediate/Advanced, or leave blank): ");
+        String levelStr = scanner.nextLine().trim();
+        if (!levelStr.isEmpty()) {
+            try {
+                filterSettings.setLevel(InternshipLevel.valueOf(levelStr));
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid level, filter not applied.");
+            }
+        } else {
+            filterSettings.setLevel(null);
+        }
+        
+        System.out.print("Filter by closing date before (YYYY-MM-DD, or leave blank): ");
+        String dateStr = scanner.nextLine().trim();
+        if (!dateStr.isEmpty()) {
+            try {
+                filterSettings.setClosingBefore(LocalDate.parse(dateStr));
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format, filter not applied.");
+            }
+        } else {
+            filterSettings.setClosingBefore(null);
+        }
+        
+        // Sorting removed for simplicity (default alphabetical by title retained)
+        
+        System.out.println("\n✓ Filters configured: " + filterSettings.getSummary());
     }
 
     /*
@@ -425,8 +503,12 @@ public class CompanyRepCliMenu {
         System.out.println("\n=== Applications for: " + selectedOpp.getTitle() + " ===");
         for (int i = 0; i < applications.size(); i++) {
             Application app = applications.get(i);
-            System.out.printf("\n%d. Student: %s%n", i + 1, app.getStudent().getUserId());
-            System.out.println("   Status: " + app.getStatus());
+            Student student = app.getStudent();
+            System.out.printf("\n%d. Student: %s (ID: %s)%n", i + 1, student.getName(), student.getUserId());
+            System.out.println("   Email: " + student.getEmail());
+            System.out.println("   Year of Study: " + student.getYearOfStudy());
+            System.out.println("   Major: " + student.getMajor());
+            System.out.println("   Application Status: " + app.getStatus());
             System.out.println("   Accepted by student: " + app.isAcceptedByStudent());
             if (app.getStatus() == EntityClass.Enums.ApplicationStatus.Pending) {
                 System.out.println("   (Actionable)");

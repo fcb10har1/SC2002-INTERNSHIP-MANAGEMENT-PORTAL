@@ -6,8 +6,13 @@ import ControlClass.WithdrawalManager;
 import EntityClass.Application;
 import EntityClass.InternshipOpportunity;
 import EntityClass.Student;
+import EntityClass.FilterSettings;
 import EntityClass.Enums.ApplicationStatus;
+import EntityClass.Enums.InternshipLevel;
+import EntityClass.Enums.OpportunityStatus;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -22,6 +27,7 @@ public class StudentCliMenu {
     private final ApplicationManager applicationManager;
     private final OpportunityManager opportunityManager;
     private final WithdrawalManager withdrawalManager;
+    private FilterSettings filterSettings = new FilterSettings(); // Persists across menu navigation
 
     /*     
      * Constructor initializes the CLI menu with required managers and scanner.
@@ -89,18 +95,46 @@ public class StudentCliMenu {
      * Displays available opportunities and allows the student to apply.
      */
     private void viewAndApplyOpportunities(Student student) {
+        // Manage filters
+        System.out.println("\n=== Filter Options ===");
+        System.out.println("Current: " + filterSettings.getSummary());
+        System.out.println("1. View opportunities with current filters");
+        System.out.println("2. Modify filters");
+        System.out.println("3. Clear all filters");
+        System.out.println("0. Back");
+        System.out.print("Choice: ");
+        
+        String filterChoice = scanner.nextLine().trim();
+        
+        if ("0".equals(filterChoice)) {
+            return;
+        } else if ("2".equals(filterChoice)) {
+            configureFilters();
+        } else if ("3".equals(filterChoice)) {
+            filterSettings.clearAll();
+            System.out.println("✓ All filters cleared.");
+        }
+        
+        // Get eligible opportunities
         List<InternshipOpportunity> eligibleOpps = opportunityManager.listVisibleFor(student);
         
-        if (eligibleOpps.isEmpty()) {
-            System.out.println("\nNo eligible opportunities available at this time.");
+        // Apply filters
+        List<InternshipOpportunity> filteredOpps = filterSettings.apply(eligibleOpps);
+        
+        if (filteredOpps.isEmpty()) {
+            System.out.println("\nNo eligible opportunities match your current filters.");
             return;
         }
         
         System.out.println("\n=== Eligible Internship Opportunities ===");
-        for (int i = 0; i < eligibleOpps.size(); i++) {
-            InternshipOpportunity opp = eligibleOpps.get(i);
+        System.out.println(filterSettings.getSummary());
+        for (int i = 0; i < filteredOpps.size(); i++) {
+            InternshipOpportunity opp = filteredOpps.get(i);
             System.out.printf("\n%d. %s%n", i + 1, opp.getTitle());
             System.out.println("   Company: " + opp.getCompanyName());
+            if (opp.getOwner() != null) {
+                System.out.println("   Company Rep: " + opp.getOwner().getName() + " (" + opp.getOwner().getUserId() + ")");
+            }
             System.out.println("   Level: " + opp.getLevel());
             System.out.println("   Major: " + opp.getPreferredMajor());
             System.out.println("   Slots: " + opp.getSlotCap());
@@ -117,11 +151,11 @@ public class StudentCliMenu {
             return;
         }
         
-        if (oppChoice == 0 || oppChoice < 0 || oppChoice > eligibleOpps.size()) {
+        if (oppChoice == 0 || oppChoice < 0 || oppChoice > filteredOpps.size()) {
             return;
         }
         
-        InternshipOpportunity selectedOpp = eligibleOpps.get(oppChoice - 1);
+        InternshipOpportunity selectedOpp = filteredOpps.get(oppChoice - 1);
         
         try {
             Application app = applicationManager.apply(student, selectedOpp);
@@ -132,9 +166,60 @@ public class StudentCliMenu {
         }
     }
     
+<<<<<<< HEAD
+    private void configureFilters() {
+        System.out.println("\n=== Configure Filters ===");
+        
+        System.out.print("Filter by status (Pending/Approved/Rejected/Filled, or leave blank): ");
+        String statusStr = scanner.nextLine().trim();
+        if (!statusStr.isEmpty()) {
+            try {
+                filterSettings.setStatus(OpportunityStatus.valueOf(statusStr));
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid status, filter not applied.");
+            }
+        } else {
+            filterSettings.setStatus(null);
+        }
+        
+        System.out.print("Filter by major (substring, or leave blank): ");
+        String major = scanner.nextLine().trim();
+        filterSettings.setPreferredMajor(major.isEmpty() ? null : major);
+        
+        System.out.print("Filter by level (Basic/Intermediate/Advanced, or leave blank): ");
+        String levelStr = scanner.nextLine().trim();
+        if (!levelStr.isEmpty()) {
+            try {
+                filterSettings.setLevel(InternshipLevel.valueOf(levelStr));
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid level, filter not applied.");
+            }
+        } else {
+            filterSettings.setLevel(null);
+        }
+        
+        System.out.print("Filter by closing date before (YYYY-MM-DD, or leave blank): ");
+        String dateStr = scanner.nextLine().trim();
+        if (!dateStr.isEmpty()) {
+            try {
+                filterSettings.setClosingBefore(LocalDate.parse(dateStr));
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format, filter not applied.");
+            }
+        } else {
+            filterSettings.setClosingBefore(null);
+        }
+        
+        // Sorting removed for simplicity (default alphabetical by title retained)
+        
+        System.out.println("\n✓ Filters configured: " + filterSettings.getSummary());
+    }
+
+=======
     /*     
      * Displays the student's applications.
      */
+>>>>>>> origin/main
     private void viewMyApplications(Student student) {
         List<Application> apps = student.getApplications();
         

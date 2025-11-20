@@ -35,8 +35,8 @@ public class ApplicationManager {
     public Application apply(Student student, InternshipOpportunity opportunity) {
         List<Application> existing = applicationRepo.findByStudent(student);
         int count = existing.size();
-        if (count >= 5) {
-            throw new IllegalStateException("Student has reached maximum number of applications (5).");
+        if (count >= 3) {
+            throw new IllegalStateException("Student has reached maximum number of applications (3).");
         }
 
         Application app = new Application(student, opportunity);
@@ -80,16 +80,20 @@ public class ApplicationManager {
         if (application.getStatus() != ApplicationStatus.Successful) {
             throw new IllegalStateException("Can only accept applications with status Successful.");
         }
+        // Mark this application as accepted by student
         application.studentAccept();
         applicationRepo.update(application);
+        // Auto-reject all other outstanding successful offers for this student
         Student s = application.getStudent();
         s.getApplications().stream()
                 .filter(other -> other != application)
-                .filter(other -> other.getStatus() == ApplicationStatus.Successful && !other.isAcceptedByStudent())
+                .filter(other -> other.getStatus() == ApplicationStatus.Pending || other.getStatus() == ApplicationStatus.Successful)
+                .filter(other -> !other.isAcceptedByStudent())
                 .forEach(other -> {
                     other.setStatus(ApplicationStatus.Unsuccessful);
                     applicationRepo.update(other);
                 });
+        // After acceptance, check if opportunity is now filled
         InternshipOpportunity opp = application.getTarget();
         if (opp.confirmedCount() >= opp.getSlotCap()) {
             opp.setStatus(OpportunityStatus.Filled);
