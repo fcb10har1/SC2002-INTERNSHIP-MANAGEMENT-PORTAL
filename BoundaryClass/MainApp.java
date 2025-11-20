@@ -54,7 +54,7 @@ public class MainApp {
         userManager = new UserManager(userRepository);
         opportunityManager = new OpportunityManager(opportunityRepository);
         applicationManager = new ApplicationManager(applicationRepository, opportunityRepository);
-        withdrawalManager = new WithdrawalManager();
+    withdrawalManager = new WithdrawalManager(opportunityRepository, applicationRepository);
         reportManager = new ReportManager(opportunityRepository, applicationRepository);
 
         // auth + login UI

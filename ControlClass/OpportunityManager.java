@@ -70,18 +70,22 @@ public class OpportunityManager {
         // Apply eligibility rules explicitly: status Approved & visible, major match, level-year mapping, slots available
         int year = student.getYearOfStudy();
         String major = student.getMajor();
+        java.time.LocalDate today = java.time.LocalDate.now();
         return opportunityRepository.findVisible().stream()
                 .filter(opp -> opp.getStatus() == OpportunityStatus.Approved && opp.isVisible())
                 .filter(opp -> opp.getPreferredMajor() == null || major.equalsIgnoreCase(opp.getPreferredMajor()))
                 .filter(opp -> {
-                    switch (opp.getLevel()) {
-                        case Basic: return year == 1; // Year 1 only
-                        case Intermediate: return year >= 2 && year <= 3; // Years 2-3
-                        case Advanced: return year >= 4; // Years 4-5 (assuming 5 possible)
-                        default: return false;
+                    // New eligibility: Year 1-2 students can ONLY apply for Basic.
+                    // Year 3 and above can apply for any level.
+                    if (year <= 2) {
+                        return opp.getLevel() == InternshipLevel.Basic;
+                    } else { // year >= 3
+                        return true; // Any level permitted
                     }
                 })
-                .filter(opp -> opp.confirmedCount() < opp.getSlotCap())
+                .filter(opp -> opp.getCloseDate() == null || !opp.getCloseDate().isBefore(today)) // Not past closing date
+                .filter(opp -> opp.getStatus() != OpportunityStatus.Filled) // Not filled
+                .filter(opp -> opp.confirmedCount() < opp.getSlotCap()) // Has available slots
                 .filter(opp -> student.getApplications().stream().noneMatch(app -> app.getTarget().equals(opp)))
                 .collect(java.util.stream.Collectors.toList());
     }
@@ -99,27 +103,32 @@ public class OpportunityManager {
         if (opportunity.getStatus() != OpportunityStatus.Approved || !opportunity.getVisible()) {
             return false;
         }
+        
+        // Check closing date
+        java.time.LocalDate today = java.time.LocalDate.now();
+        if (opportunity.getCloseDate() != null && opportunity.getCloseDate().isBefore(today)) {
+            return false;
+        }
+        
+        // Check if opportunity is filled
+        if (opportunity.getStatus() == OpportunityStatus.Filled) {
+            return false;
+        }
+        
         if (student.getApplications().stream()
                 .anyMatch(app -> app.getTarget().equals(opportunity))) {
             return false;
         }
-        if (student.getApplications().size() >= 5) {
+        if (student.getApplications().size() >= 3) {
             return false;
         }
 
-        InternshipLevel level = opportunity.getLevel();
         int year = student.getYearOfStudy();
-        switch (level) {
-            case Basic:
-                if (year != 1) return false;
-                break;
-            case Intermediate:
-                if (year < 2 || year > 3) return false;
-                break;
-            case Advanced:
-                if (year < 4) return false; // Advanced only for year 4-5
-                break;
-        }
+        if (year <= 2) { // Year 1-2 only Basic allowed
+            if (opportunity.getLevel() != InternshipLevel.Basic) {
+                return false;
+            }
+        } // Year 3+ any level allowed
 
         if (opportunity.confirmedCount() >= opportunity.getSlotCap()) {
             return false;

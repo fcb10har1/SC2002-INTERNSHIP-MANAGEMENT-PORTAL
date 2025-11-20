@@ -4,6 +4,11 @@ import EntityClass.Application;
 import EntityClass.CareerStaff;
 import EntityClass.Student;
 import EntityClass.WithdrawalRequest;
+import EntityClass.InternshipOpportunity;
+import EntityClass.Enums.OpportunityStatus;
+import EntityClass.Enums.ApplicationStatus;
+import RepositoryClass.IApplicationRepository;
+import RepositoryClass.IOpportunityRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +19,27 @@ import java.util.UUID;
 public class WithdrawalManager {
 
     private final List<WithdrawalRequest> requests = new ArrayList<>();
+    private final IApplicationRepository applicationRepository;
+    private final IOpportunityRepository opportunityRepository;
+
+    public WithdrawalManager(IOpportunityRepository opportunityRepository, IApplicationRepository applicationRepository) {
+        this.opportunityRepository = opportunityRepository;
+        this.applicationRepository = applicationRepository;
+    }
+
+    // Legacy no-arg constructor (kept if referenced elsewhere; repositories null -> limited functionality)
+    public WithdrawalManager() {
+        this.opportunityRepository = null;
+        this.applicationRepository = null;
+    }
 
     // student requests withdrawal
     public WithdrawalRequest requestWithdrawal(Student student, Application application, String reason) {
+        // Prevent duplicate or redundant withdrawal if one is pending or already approved
+        boolean blocked = requests.stream().anyMatch(r -> r.getApplication().equals(application) && (!r.isProcessed() || r.isApproved()));
+        if (blocked) {
+            throw new IllegalStateException("A withdrawal request for this application is already pending or was approved.");
+        }
         String id = UUID.randomUUID().toString();
         WithdrawalRequest request = new WithdrawalRequest(id, application, reason);
         request.submitRequest();
@@ -34,6 +57,19 @@ public class WithdrawalManager {
         }
         req.approve(staff);
 
+        // Side-effects: mark application withdrawn (set unsuccessful) & update opportunity state
+        Application app = req.getApplication();
+        if (app.getStatus() == ApplicationStatus.Successful) {
+            app.setStatus(ApplicationStatus.Withdrawn); // mark withdrawn distinctly
+            app.revokeStudentAcceptance();
+            if (applicationRepository != null) applicationRepository.update(app);
+            InternshipOpportunity opp = app.getTarget();
+            // If opportunity was previously filled and now has free slots, revert to Approved
+            if (opp.getStatus() == OpportunityStatus.Filled && opp.confirmedCount() < opp.getSlotCap()) {
+                opp.setStatus(OpportunityStatus.Approved);
+                if (opportunityRepository != null) opportunityRepository.update(opp);
+            }
+        }
         System.out.println("Withdrawal request " + requestId + " approved by " + staff.getUserId());
     }
 

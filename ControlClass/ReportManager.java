@@ -146,4 +146,115 @@ public class ReportManager {
     }
     return sb.toString();
     }
+
+    // Filtered composite report with aggregates limited to filtered subset
+    public String generateFilteredCompositeReport(Map<String,String> filters) {
+        List<InternshipOpportunity> base = opportunityRepository.all();
+        java.util.stream.Stream<InternshipOpportunity> stream = base.stream();
+
+        if (filters.containsKey("status")) {
+            try {
+                OpportunityStatus st = OpportunityStatus.valueOf(filters.get("status"));
+                stream = stream.filter(o -> o.getStatus() == st);
+            } catch (IllegalArgumentException ignored) {}
+        }
+        if (filters.containsKey("major")) {
+            String major = filters.get("major").toLowerCase();
+            stream = stream.filter(o -> o.getPreferredMajor() != null && o.getPreferredMajor().toLowerCase().contains(major));
+        }
+        if (filters.containsKey("company")) {
+            String company = filters.get("company").toLowerCase();
+            stream = stream.filter(o -> o.getCompanyName() != null && o.getCompanyName().toLowerCase().contains(company));
+        }
+        if (filters.containsKey("title")) {
+            String title = filters.get("title").toLowerCase();
+            stream = stream.filter(o -> o.getTitle() != null && o.getTitle().toLowerCase().contains(title));
+        }
+        if (filters.containsKey("level")) {
+            try {
+                InternshipLevel lvl = InternshipLevel.valueOf(filters.get("level"));
+                stream = stream.filter(o -> o.getLevel() == lvl);
+            } catch (IllegalArgumentException ignored) {}
+        }
+        if (filters.containsKey("placement")) {
+            String placement = filters.get("placement").toLowerCase();
+            if ("filled".equals(placement)) {
+                stream = stream.filter(InternshipOpportunity::slotsFilled);
+            } else if ("open".equals(placement)) {
+                stream = stream.filter(o -> !o.slotsFilled());
+            }
+        }
+
+        List<InternshipOpportunity> filtered = stream.collect(Collectors.toList());
+
+        // Applications limited to those whose opportunity is in filtered set
+        List<Application> apps = applicationRepository.all().stream()
+                .filter(a -> filtered.contains(a.getTarget()))
+                .collect(Collectors.toList());
+        if (filters.containsKey("appStatus")) {
+            String raw = filters.get("appStatus");
+            try {
+                EntityClass.Enums.ApplicationStatus desired = EntityClass.Enums.ApplicationStatus.valueOf(raw);
+                apps = apps.stream().filter(a -> a.getStatus() == desired).collect(Collectors.toList());
+            } catch (IllegalArgumentException ignored) {}
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== Filtered Internship Report ===\n");
+    sb.append("Applied Filters: ").append(filters.isEmpty() ? "(none)" : filters.toString()).append('\n');
+    sb.append("Filtered Opportunity Count: ").append(filtered.size()).append('\n');
+
+        // Status counts within filtered set
+    java.util.Map<OpportunityStatus, Long> statusCounts = filtered.stream()
+                .collect(Collectors.groupingBy(InternshipOpportunity::getStatus, Collectors.counting()));
+        for (OpportunityStatus st : OpportunityStatus.values()) {
+            sb.append("  ").append(st).append(": ")
+              .append(statusCounts.getOrDefault(st, 0L)).append('\n');
+        }
+
+    long filled = filtered.stream().filter(InternshipOpportunity::slotsFilled).count();
+    long open = filtered.size() - filled;
+        sb.append("Filled: ").append(filled).append(" | Open: ").append(open).append('\n');
+
+        // Major distribution
+        sb.append("\nBy Preferred Major:\n");
+    java.util.Map<String, Long> byMajor = filtered.stream()
+                .collect(Collectors.groupingBy(o -> o.getPreferredMajor() == null ? "(Unspecified)" : o.getPreferredMajor(), Collectors.counting()));
+        byMajor.forEach((m,c) -> sb.append("  ").append(m).append(": ").append(c).append('\n'));
+
+        // Level distribution
+        sb.append("\nBy Level:\n");
+    java.util.Map<InternshipLevel, Long> byLevel = filtered.stream()
+                .filter(o -> o.getLevel() != null)
+                .collect(Collectors.groupingBy(InternshipOpportunity::getLevel, Collectors.counting()));
+        for (InternshipLevel lvl : InternshipLevel.values()) {
+            sb.append("  ").append(lvl).append(": ")
+              .append(byLevel.getOrDefault(lvl, 0L)).append('\n');
+        }
+
+        // Application summary within filtered set
+        sb.append("\nApplications Summary (filtered):\n");
+        sb.append("Total Applications: ").append(apps.size()).append('\n');
+        java.util.Map<EntityClass.Enums.ApplicationStatus, Long> appStatusCounts = apps.stream()
+                .collect(Collectors.groupingBy(Application::getStatus, Collectors.counting()));
+        for (EntityClass.Enums.ApplicationStatus as : EntityClass.Enums.ApplicationStatus.values()) {
+            sb.append("  ").append(as).append(": ")
+              .append(appStatusCounts.getOrDefault(as, 0L)).append('\n');
+        }
+        long confirmed = apps.stream().filter(Application::isConfirmed).count();
+        sb.append("Confirmed (student accepted successful offers): ").append(confirmed).append('\n');
+
+        // Detailed list
+        sb.append("\nDetailed Opportunities (remaining slots):\n");
+                for (InternshipOpportunity o : filtered) {
+            sb.append("- ").append(o.getTitle())
+              .append(" [").append(o.getCompanyName()).append("] ")
+              .append(o.getStatus()).append(" | Level=").append(o.getLevel())
+              .append(" | Major=").append(o.getPreferredMajor())
+              .append(" | Remaining/Cap=").append(o.getSlots()).append('/')
+              .append(o.getSlotCap())
+              .append("\n");
+        }
+        return sb.toString();
+    }
 }
