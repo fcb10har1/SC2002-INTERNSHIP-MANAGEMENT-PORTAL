@@ -78,9 +78,17 @@ public class LoginUI {
         
         User user = userOpt.get();
         
-        // Check if CompanyRep and if approved
+        // Check if CompanyRep and their approval status
         if (user instanceof CompanyRep) {
             CompanyRep rep = (CompanyRep) user;
+            
+            // Check if rejected first
+            if (authService.isRejectedCompanyRep(rep)) {
+                System.out.println("Login failed. Your Company Representative account has been rejected by Career Center Staff.");
+                return Optional.empty();
+            }
+            
+            // Then check if not yet approved (pending)
             if (!authService.isApprovedCompanyRep(rep)) {
                 System.out.println("Login failed. Your Company Representative account is pending approval by Career Center Staff.");
                 System.out.println("Please wait for approval before logging in.");

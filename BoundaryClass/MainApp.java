@@ -23,7 +23,8 @@ import java.util.Scanner;
 
 /**
  * MainApp is the entry point for the Internship Placement Management System CLI application.
- * It initializes repositories, managers, and user interfaces, and starts the main interaction loop.
+ * It initializes repositories, managers, and user interfaces, imports users from CSV files for students and career staff,
+ * and starts the main interaction loop. Company representatives are registered interactively by user input.
  */
 public class MainApp {
 
@@ -57,13 +58,14 @@ public class MainApp {
 
     /**
      * Constructs MainApp initializing all repositories, managers, UIs, and imports users from CSV files.
+     * Students and career staff are loaded from CSV files; company representatives are registered interactively.
      */
     public MainApp() {
         // managers
         userManager = new UserManager(userRepository);
         opportunityManager = new OpportunityManager(opportunityRepository);
         applicationManager = new ApplicationManager(applicationRepository, opportunityRepository);
-    withdrawalManager = new WithdrawalManager(opportunityRepository, applicationRepository);
+        withdrawalManager = new WithdrawalManager(opportunityRepository, applicationRepository);
         reportManager = new ReportManager(opportunityRepository, applicationRepository);
 
         // auth + login UI
@@ -72,14 +74,11 @@ public class MainApp {
 
         // menus
         studentMenu = new StudentCliMenu(scanner, applicationManager, opportunityManager, withdrawalManager);
-    companyRepMenu = new CompanyRepCliMenu(scanner, applicationManager, opportunityManager);
+        companyRepMenu = new CompanyRepCliMenu(scanner, applicationManager, opportunityManager);
         careerStaffMenu = new CareerStaffCliMenu(scanner, opportunityManager, withdrawalManager, reportManager, userManager);
 
         // Import users from CSV files
         importUsersFromCSV();
-        
-        // seed additional demo users for testing (if CSV import fails or for testing)
-        seedDemoUsers();
     }
 
     /*     
@@ -96,43 +95,13 @@ public class MainApp {
         int staffCount = CSVImporter.importCareerStaff("careerstaff.csv", userRepository);
         System.out.println("✓ Imported " + staffCount + " career staff from careerstaff.csv");
         
-        // Import company representatives
-        int repCount = CSVImporter.importCompanyReps("companyreps.csv", userRepository);
-        System.out.println("✓ Imported " + repCount + " company representatives from companyreps.csv");
+        // Company representatives start empty - they register through the UI
+        System.out.println("✓ Company representatives: 0 (will be registered through UI)");
         
         System.out.println();
     }
 
-    /**
-     * Seeds demo users into the user repository for testing purposes.
-     */
-    private void seedDemoUsers() {
-        // Create demo users with email - all with default password "password"
-        // Only add if they don't already exist (to avoid duplicates from CSV)
-        
-        // Student ID format: U followed by 7 digits and ends with a letter (e.g., U2345123F)
-        if (!userRepository.findById("U9999999Z").isPresent()) {
-            Student student = new Student("U9999999Z", "Alice Demo Student", "alice.demo@e.ntu.edu.sg", 2, "Computer Science");
-            userRepository.add(student);
-            System.out.println("Demo student created: ID=U9999999Z, password=password");
-        }
-        
-        // Company Representative ID is their company email address
-        if (!userRepository.findById("demo.rep@techcorp.com").isPresent()) {
-            CompanyRep companyRep = new CompanyRep("demo.rep@techcorp.com", "Bob Demo CompanyRep", "demo.rep@techcorp.com", "TechCorp", "Engineering", "HR Manager");
-            userRepository.add(companyRep);
-            System.out.println("Demo CompanyRep created: ID=demo.rep@techcorp.com, password=password");
-        }
-        
-        // Career Center Staff's ID is their NTU account
-        if (!userRepository.findById("demo001").isPresent()) {
-            CareerStaff careerStaff = new CareerStaff("demo001", "Carol Demo Staff", "demo001@ntu.edu.sg", "Career Services");
-            userRepository.add(careerStaff);
-            System.out.println("Demo CareerStaff created: ID=demo001, password=password");
-        }
-        
-        System.out.println();
-    }
+
 
     /**
      * Starts the main CLI interaction loop.

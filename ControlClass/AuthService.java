@@ -76,6 +76,19 @@ public class AuthService {
     }
 
     /**
+     * Checks if a company representative has been rejected.
+     * @param rep company representative
+     * @return true if rejected, false otherwise
+     */
+    public boolean isRejectedCompanyRep(CompanyRep rep) {
+        if (userRepository instanceof UserRepository) {
+            UserRepository concrete = (UserRepository) userRepository;
+            return concrete.isCompanyRepRejected(rep);
+        }
+        return false;
+    }
+
+    /**
      * Returns the backing user repository.
      * @return user repository
      */
